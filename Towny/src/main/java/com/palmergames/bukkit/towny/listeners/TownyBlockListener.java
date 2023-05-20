@@ -51,7 +51,7 @@ public class TownyBlockListener implements Listener {
 		plugin = instance;
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
 
 		if (plugin.isError()) {
