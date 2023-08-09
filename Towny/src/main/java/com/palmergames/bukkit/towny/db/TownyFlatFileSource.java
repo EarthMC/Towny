@@ -644,8 +644,6 @@ public final class TownyFlatFileSource extends TownyDatabaseHandler {
 			} catch (Exception e) {
 				plugin.getLogger().log(Level.WARNING, Translation.of("flatfile_err_reading_resident_at_line", resident.getName(), line, resident.getName()), e);
 				return false;
-			} finally {
-				if (save) saveResident(resident);
 			}
 			return true;
 		} else {
@@ -1115,9 +1113,6 @@ public final class TownyFlatFileSource extends TownyDatabaseHandler {
 			} catch (Exception e) {
 				plugin.getLogger().log(Level.WARNING, Translation.of("flatfile_err_reading_town_file_at_line", town.getName(), line, town.getName()), e);
 				return false;
-			} finally {
-				if (town.exists())
-					saveTown(town);
 			}
 			return true;
 		} else {
@@ -1300,8 +1295,6 @@ public final class TownyFlatFileSource extends TownyDatabaseHandler {
 			} catch (Exception e) {
 				plugin.getLogger().log(Level.WARNING, Translation.of("flatfile_err_reading_nation_file_at_line", nation.getName(), line, nation.getName()), e);
 				return false;
-			} finally {
-				saveNation(nation);
 			}
 			return true;
 		} else {
