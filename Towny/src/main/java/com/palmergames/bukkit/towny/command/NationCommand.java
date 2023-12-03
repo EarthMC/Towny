@@ -69,7 +69,6 @@ import com.palmergames.bukkit.towny.utils.MoneyUtil;
 import com.palmergames.bukkit.towny.utils.NameUtil;
 import com.palmergames.bukkit.towny.utils.ResidentUtil;
 import com.palmergames.bukkit.towny.utils.SpawnUtil;
-import com.palmergames.bukkit.towny.utils.TownyComponents;
 import com.palmergames.bukkit.util.BookFactory;
 import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.ChatTools;
@@ -133,7 +132,8 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 		"baltop"
 	);
 
-	private static final List<String> nationSetTabCompletes = Arrays.asList(
+	@VisibleForTesting
+	public static final List<String> nationSetTabCompletes = Arrays.asList(
 		"king",
 		"leader",
 		"capital",
@@ -459,7 +459,6 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 
 		switch (split[0].toLowerCase(Locale.ROOT)) {
 		case "list":
-			checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_LIST.getNode());
 			listNations(player, split);
 			break;
 		case "townlist":
@@ -556,7 +555,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 			break;
 		case "say":
 			checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_SAY.getNode());
-			nationSay(getNationFromPlayerOrThrow(player), StringMgmt.remFirstArg(split));
+			nationSay(player, StringMgmt.remFirstArg(split));
 			break;
 		case "bankhistory":
 			checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_NATION_BANKHISTORY.getNode());
@@ -599,11 +598,10 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 		return false;
 }
 
-	private void nationSay(Nation nation, String[] split) throws TownyException {
+	private void nationSay(Player player, String[] split) throws TownyException {
 		if (split.length == 0)
 			throw new TownyException("ex: /n say [message here]");
-		TownyMessaging.sendPrefixedNationMessage(nation, TownyComponents.stripClickTags(StringMgmt.join(split)));
-
+		getNationFromPlayerOrThrow(player).playerBroadCastMessageToNation(player, StringMgmt.join(split));
 	}
 
 	private void nationBankHistory(Player player, String[] split) throws TownyException {
@@ -2434,7 +2432,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 			throw new TownyException(Translatable.of("msg_nation_already_not_peaceful"));
 
 		if (peacefulState && TownyEconomyHandler.isActive() && !nation.getAccount().canPayFromHoldings(cost))
-			throw new TownyException(Translatable.of("msg_nation_cant_peaceful"));
+			throw new TownyException(Translatable.of("msg_nation_cant_peaceful", TownyEconomyHandler.getFormattedBalance(cost)));
 		
 		String uuid = nation.getUUID().toString();
 		
@@ -2590,7 +2588,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 		/*
 		 * This is run async because it will ping the economy plugin for the nation bank value.
 		 */
-		plugin.getScheduler().runAsync(() -> TownyMessaging.sendStatusScreen(sender, TownyFormatter.getStatus(nation, sender)));
+		TownyEconomyHandler.economyExecutor().execute(() -> TownyMessaging.sendStatusScreen(sender, TownyFormatter.getStatus(nation, sender)));
 	}
 	
 	/**

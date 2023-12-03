@@ -30,8 +30,6 @@ public class StringMgmt {
 
 	public static final Pattern hexPattern = Pattern.compile("(&#|\\{|§x|<#)([a-fA-F0-9]|§[a-fA-F0-9]){6}(}|>|)");
 	public static final Pattern hexReplacePattern = Pattern.compile("(§x|[&{}<>§#])");
-	public static final @Deprecated Pattern ampersandPattern = Pattern.compile("(?<!\\\\)(&#[a-fA-F0-9]{6})"); // Deprecated sometime during 0.98.*.*
-	public static final @Deprecated Pattern bracketPattern = Pattern.compile("(?<!\\\\)\\{(#[a-fA-F0-9]{6})}"); // Deprecated sometime during 0.98.*.*
 
 	private static final Function<String, String> legacyHexFunction = (hex) -> ChatColor.of("#" + hex).toString();
 
@@ -211,7 +209,7 @@ public class StringMgmt {
 		else if (s.equalsIgnoreCase("off"))
 			return false;
 		else
-			throw new Exception(Translation.of("msg_err_invalid_input", " on/off."));
+			throw new Exception(Translation.of("msg_err_invalid_input", "on/off."));
 	}
 	
 	public static boolean isAllUpperCase(@NotNull String string) {

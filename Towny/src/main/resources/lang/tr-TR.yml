@@ -54,10 +54,10 @@ help_9: 'Townyadmin command help.'
 towny_help_0: "General help for Towny"
 towny_help_1: "Displays a map of the nearby townblocks"
 towny_help_2: "Display the prices used with Economy"
-towny_help_3: "Display highscores"
-towny_help_4: "Display time until a new day"
-towny_help_5: "Displays stats"
-towny_help_6: "Displays the version of Towny"
+towny_help_3: "Yüksek skorları göster"
+towny_help_4: "Yeni güne kalan zamanı göster"
+towny_help_5: "İstatistikleri Görüntüle"
+towny_help_6: "Towny'nin sürümünü göster"
 towny_top_help_0: "List top residents based on subcommand."
 towny_top_help_1: "List top land-owners based on subcommand."
 towny_top_help_2: "List wealthiest based on subcommand."
@@ -78,7 +78,7 @@ town_help_16: "See a list of plotgroups in the town."
 town_help_17: "See a list of plot types in the town."
 town_help_18: "Say a message to the town members."
 town_help_19: "Set your town for sale, able to be bought by other players."
-town_help_20: "Set your town not for sale."
+town_help_20: "Kasabanı satılışını iptal et."
 town_help_21: "Buy the given town, as long as it is for sale."
 town_help_22: "Deposit money into your town's bank."
 town_help_23: "Used to modify your resident's town ranks."
@@ -87,18 +87,18 @@ town_help_25: "Used to modify your town's outlaws."
 town_help_26: "List all towns, see /t list ? for help."
 town_help_27: "Leave the town you're a member of."
 town_help_28: "Withdraw money from your town's bank."
-town_help_29: "Use /t claim ? for help."
+town_help_29: "Yardım için /t claim kullanın."
 town_help_30: "Used to unclaim land from your town."
-town_help_31: "Add or remove residents."
-town_help_32: "Use /t set ? for help."
-town_help_33: "Use /t buy ? for help."
-town_help_34: "Use /t toggle ? for help."
-town_help_35: "Use /t rank ? for help."
-town_list_help_0: "View the specified page."
-town_list_help_1: "List towns by resident-count, with the specified page."
-town_list_help_2: "List towns which are open, with the specified page."
-town_list_help_3: "List towns using bank balance, with the specified page."
-town_list_help_4: "List towns in alphabetical order, with the specified page."
+town_help_31: "Üyeleri ekle ya da kaldır."
+town_help_32: "Yardım için /t set ? kullanın."
+town_help_33: "Yardım için /t buy ? kullanın."
+town_help_34: "Yardım için /t toggle ? kullanın."
+town_help_35: "Yardım için /t rank kullanın."
+town_list_help_0: "Belirtilen sayfayı gör."
+town_list_help_1: "Kasabaları üye sayısına göre listelenmiş sayfada göster."
+town_list_help_2: "Açık kasabaları listelenmiş sayfada göster."
+town_list_help_3: "Kasabaları banka bakiyelerine göre listelenmiş sayfada göster."
+town_list_help_4: "Kasabaları alfabetik sıraya göre listelenmiş sayfada göster."
 town_list_help_5: "List towns by claimed land, with the specified page."
 town_list_help_6: "List towns by number online, with the specified page."
 town_set_help_0: "Set your town's board."
@@ -347,9 +347,15 @@ ta_set_help_6: "Set a plot to a different town."
 ta_set_help_7: "Set a town's founder name."
 ta_set_help_8: "Use size 0 to remove nationzone override."
 ta_purge_help_0: "Purges residents who haven't logged in for longer than the given days, optionally set townless to remove only townless players, or specify a townname to only purge one town's residents."
-ta_townmeta_help_1: "View the metadata stored in the town you are stood in."
+ta_townmeta_help_1: "View the metadata stored on the town you specify."
 ta_townmeta_help_2: "Set town metadata key and value."
-ta_townmeta_help_3: "Add or remove a metadata by key."
+ta_townmeta_help_3: "Add or remove a metadata by key from the town."
+ta_residentmeta_help_1: "View the metadata stored on the resident you specify."
+ta_residentmeta_help_2: "Set resident metadata key and value."
+ta_residentmeta_help_3: "Add or remove a metadata by key from the resident."
+ta_nationmeta_help_1: "View the metadata stored on the nation you specify."
+ta_nationmeta_help_2: "Set nation metadata key and value."
+ta_nationmeta_help_3: "Add or remove a metadata by key from the nation."
 ta_reload_help_0: "Reloads database."
 ta_reload_help_1: "Reloads config."
 ta_reload_help_2: "Reloads language files."
@@ -421,7 +427,7 @@ msg_payed_resident_tax: '&bÖdenen ikamet vergisi '
 msg_bankrupt_town: ' kasaba olarak kalmayı göze alamazdım.'
 msg_bankrupt_nation: ' bir ulus olarak kalmayı göze alamazdım.'
 msg_nation_not_peaceful: '&bUlus, barışçıl devleti karşılayamaz.'
-msg_nation_cant_peaceful: '&bUlus barışçıl bir ulus olmayı kaldıramaz.'
+msg_nation_cant_peaceful: '&bNation couldn''t afford to become a peaceful nation. You must be able to pay % daily.'
 msg_peaceful_disabled: '&bUlus barışı küresel olarak devre dışı bırakıldı.'
 msg_you_paid: '&bBarışçıl bir statü ayarlamak için %s altın ödediniz.'
 msg_nation_set_peace: '&bUlusun devleti başarıyla değiştirildi.'
@@ -1088,6 +1094,12 @@ msg_err_key_cannot_be_deleted: 'Anahtar mevcut olmadığı için silinemez!'
 msg_err_this_town_doesnt_have_any_associated_metadata: 'Bu kasabanın ilişkili herhangi bir meta verisi yok.'
 msg_err_key_x_is_not_part_of_this_town: '%s anahtarı bu kasabanın bir parçası değil, mümkünse lütfen ekleyin.'
 msg_custom_data_was_successfully_added_to_town: 'Özel veriler şehire başarıyla eklendi!'
+msg_err_this_resident_doesnt_have_any_associated_metadata: 'This resident doesn''t have any associated metadata.'
+msg_err_key_x_is_not_part_of_this_resident: 'Key %s is not part of this resident, if possible please add it.'
+msg_custom_data_was_successfully_added_to_resident: 'Custom data was successfully added to resident!'
+msg_err_this_nation_doesnt_have_any_associated_metadata: 'This nation doesn''t have any associated metadata.'
+msg_err_key_x_is_not_part_of_this_nation: 'Key %s is not part of this nation, if possible please add it.'
+msg_custom_data_was_successfully_added_to_nation: 'Custom data was successfully added to nation!'
 msg_error_too_many_pages: 'Çok fazla sayfa.'
 msg_err_location_is_not_within_a_town: 'Konum bir kasaba içinde değil.'
 msg_err_location_is_not_within_a_jail_plot: 'Konum bir Hapishane arsası içinde değil.'
@@ -1463,7 +1475,7 @@ msg_resident_has_not_played_long_enough_to_be_jailed: '%s hapse atılacak kadar 
 msg_town_not_peaceful: '&bTown barışçıl bir devleti karşılayamazdı.'
 msg_town_already_peaceful: '&bŞehir zaten barışçıl.'
 msg_town_already_not_peaceful: '&bKasaba zaten barışçıl değil.'
-msg_town_cant_peaceful: '&bKasaba, barışçıl bir kasaba olmayı göze alamazdı.'
+msg_town_cant_peaceful: '&bTown couldn''t afford to become a peaceful town. You need to be able to pay %s per day.'
 msg_town_paid_for_neutral_status: '&bKasabanız, barışçıl statünüzü korumak için %s altın ödedi.'
 msg_nation_paid_for_neutral_status: '&bUlusunuz, barışçıl statünüzü korumak için %s altın ödedi.'
 your_town_has_been_invited_to_join_nation: 'Kasabanız ulusa katılmaya davet edildi: %s'
@@ -1586,10 +1598,10 @@ status_jailed: 'Hapis_Durumu:'
 status_bad_yes: '&cEVET'
 status_good_no: '&aHAYIR'
 status_resident_tax_title: '%s Vergisi'
-help_menu_command: '<mavi>'
-help_menu_subcommand: '<su>'
-help_menu_explanation: '<gri>'
-help_menu_requirement: '<kırmızı>'
+help_menu_command: '<blue>'
+help_menu_subcommand: '<aqua>'
+help_menu_explanation: '<gray>'
+help_menu_requirement: '<red>'
 #Added in 0.122
 msg_warn_the_following_towns_will_be_removed_from_the_merged_nation: "Ülke başkentinize yeterince yakın olmayacakları için, birleştirme tamamlandığında şu kasabalar kaldırılacak: %s.\n"
 #Added in 0.123
@@ -2026,7 +2038,26 @@ msg_town_sell_confirmation: "This will put your town up for sale for %s. Are you
 msg_town_buytown_already_mayor: "You are already mayor of %s."
 msg_town_buytown_confirmation: "Buying %s will cost %s and remove you from any town you may currently be a part of. Are you sure you want to continue?"
 msg_town_buytown_not_forsale: "Specified town is not for sale."
+msg_town_buytown_ruined: "Ruined towns cannot be bought."
 msg_resident_about_reset: "&bResident about reset."
 msg_err_invalid_string_about_not_set: "Invalid string, resident about not set."
 msg_set_about: "%s's about was set to %s."
 msg_clear_about: "%s's about was cleared."
+#Message shown when toggling town visibleontoplists setting
+msg_town_visibleontoplist_setting_set_to: 'The town %s has had their visible-on-top-lists setting set to %s.'
+#Message shown when an admin overrides a town founding date via townyadmin.
+townyadmin_town_set_help_0: "Sets the founding date of a town."
+townyadmin_nation_set_help_0: "Sets the founding date of a nation."
+msg_town_registered_set: "Founding date of town: '%s' set to: '%s'."
+msg_nation_registered_set: "Founding date of nation: '%s' set to: '%s'."
+msg_err_time_cannot_be_in_the_future: "Specified time cannot be in the future."
+#The format used for the /t say and /n say commands.
+town_say_format: "%s says: %s"
+msg_err_floodfill_not_in_wild: "You cannot use floodfill while standing in a claimed area."
+msg_err_floodfill_out_of_bounds: "Claim shape must be fully closed off in order to floodfill."
+msg_err_floodfill_cannot_contain_towns: "Flood fill selection must not contain other towns."
+#Message shown when a resident is an NPC and is not allowed to do something.
+msg_err_resident_is_npc: "You cannot do this to an NPC resident."
+#Message shown when a resident doesn't own any land and the /res plotlist command is used.
+msg_err_resident_doesnt_own_any_land: "The resident does not own any land personally."
+msg_unnamed: "Unnamed"

@@ -183,6 +183,12 @@ public enum ConfigNodes {
 			"# set to 0 to disable limiting of claim radius value check.",
 			"# keep in mind that the default value of 4 is a radius, ",
 			"# and it will allow claiming 9x9 (80 plots) at once."),
+	TOWN_MAX_BUYTOWN_PRICE(
+			"town.max_buytown_price",
+			"999999999",
+			"",
+			"# The Maximum price that a town can be put for sale at. This refers to the price that",
+			"# someone could pay if they ran /t buytown, to buy a town that has been put up for sale."),
 
 	TOWN_OVERCLAIMING_ROOT("town.overclaiming", "", "", ""),
 	TOWN_OVER_ALLOWED_CLAIM_LIMITS_ALLOWS_STEALING_LAND(
@@ -1277,6 +1283,11 @@ public enum ConfigNodes {
 			"30",
 			"",
 			"# Number of seconds that must pass before a player who is not a member or ally can use /n spawn."),
+	GNATION_SETTINGS_NATION_LEVEL_IS_DETERMINED_BY_TOWNS_COUNT(
+			"global_nation_settings.nation_level_is_determined_by_town_count_instead_of_resident_count",
+			"false",
+			"",
+			"# When set to true, the nation's NationLevel is determined by the number of towns in the nations, instead of the number of residents."),
 	GNATION_SETTINGS_MAX_TOWNS_PER_NATION(
 			"global_nation_settings.max_towns_per_nation",
 			"0",
@@ -1529,7 +1540,8 @@ public enum ConfigNodes {
 			"filters_colour_chat.modify_chat.max_name_length",
 			"20",
 			"",
-			"# Maximum length of Town and Nation names."),
+			"# Maximum length of Town and Nation names. Setting this to a number below your current max_name_length could result in",
+			"# safe mode if the new value is below of your existing town and nation name lengths."),
 	FILTERS_MAX_TAG_LENGTH(
 			"filters_colour_chat.modify_chat.max_tag_length",
 			"4",
@@ -1635,7 +1647,7 @@ public enum ConfigNodes {
 			"# A full list of proper names can be found here https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html "),
 	PROT_SWITCH_MAT(
 			"protection.switch_ids",
-			"CHEST,SHULKER_BOXES,TRAPPED_CHEST,FURNACE,BLAST_FURNACE,DISPENSER,HOPPER,DROPPER,JUKEBOX,SMOKER,COMPOSTER,BELL,BARREL,BREWING_STAND,LEVER,NON_WOODEN_PRESSURE_PLATES,BUTTONS,WOOD_DOORS,FENCE_GATES,TRAPDOORS,MINECARTS,LODESTONE,RESPAWN_ANCHOR,TARGET,OAK_CHEST_BOAT",
+			"CHEST,SHULKER_BOXES,TRAPPED_CHEST,FURNACE,BLAST_FURNACE,DISPENSER,HOPPER,DROPPER,JUKEBOX,SMOKER,COMPOSTER,BELL,BARREL,BREWING_STAND,LEVER,NON_WOODEN_PRESSURE_PLATES,BUTTONS,WOOD_DOORS,FENCE_GATES,TRAPDOORS,MINECARTS,LODESTONE,RESPAWN_ANCHOR,TARGET,OAK_CHEST_BOAT,DECORATED_POT,CRAFTER",
 			"",
 			"# Blocks that are protected via town/plot flags.",
 			"# These are blocks in the world that will be protected by a town/resident/plot's switch setting.",

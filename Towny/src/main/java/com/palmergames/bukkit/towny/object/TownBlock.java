@@ -327,18 +327,6 @@ public class TownBlock extends TownyObject {
 		BukkitTools.fireEvent(new PlotChangeTypeEvent(this.type, type, this));
 
 		switch (type.getName().toLowerCase(Locale.ROOT)) {
-			case "default":
-			case "shop":
-			case "embassy":
-			case "bank":
-			case "inn":
-				if (this.hasResident()) {
-					setPermissions(this.resident.getPermissions().toString());
-				} else {
-					setPermissions(this.town.getPermissions().toString());
-				}
-
-				break;
 			case "arena":
 				setPermissions("pvp");
 				break; 
@@ -349,8 +337,17 @@ public class TownBlock extends TownyObject {
 			case "wilds":
 				setPermissions("residentBuild,residentDestroy");
 				break;
-			default:
-				break;
+			case "default":
+			case "shop":
+			case "embassy":
+			case "bank":
+			case "inn":
+			default: // Any custom TownBlockTypes will also get caught here and reset to the town/resident default.
+				if (this.hasResident()) {
+					setPermissions(this.resident.getPermissions().toString());
+				} else {
+					setPermissions(this.town.getPermissions().toString());
+				}
 		}
 		
 		// Set the changed status.
@@ -469,25 +466,6 @@ public class TownBlock extends TownyObject {
 	public WorldCoord getWorldCoord() {
 
 		return this.worldCoord;
-	}
-
-	/**
-	 * Is the TownBlock locked
-	 * 
-	 * @deprecated as of 0.98.6.25, Towny will no longer block town blocks while taking snapshots.
-	 * @return the locked
-	 */
-	@Deprecated
-	public boolean isLocked() {
-		return false;
-	}
-
-	/**
-	 * @param locked is the to locked to set
-	 * @deprecated as of 0.98.6.25, Towny will no longer block town blocks while taking snapshots.
-	 */
-	@Deprecated
-	public void setLocked(boolean locked) {
 	}
 
 	/**

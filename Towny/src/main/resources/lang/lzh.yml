@@ -347,9 +347,15 @@ ta_set_help_6: "Set a plot to a different town."
 ta_set_help_7: "Set a town's founder name."
 ta_set_help_8: "Use size 0 to remove nationzone override."
 ta_purge_help_0: "Purges residents who haven't logged in for longer than the given days, optionally set townless to remove only townless players, or specify a townname to only purge one town's residents."
-ta_townmeta_help_1: "View the metadata stored in the town you are stood in."
+ta_townmeta_help_1: "View the metadata stored on the town you specify."
 ta_townmeta_help_2: "Set town metadata key and value."
-ta_townmeta_help_3: "Add or remove a metadata by key."
+ta_townmeta_help_3: "Add or remove a metadata by key from the town."
+ta_residentmeta_help_1: "View the metadata stored on the resident you specify."
+ta_residentmeta_help_2: "Set resident metadata key and value."
+ta_residentmeta_help_3: "Add or remove a metadata by key from the resident."
+ta_nationmeta_help_1: "View the metadata stored on the nation you specify."
+ta_nationmeta_help_2: "Set nation metadata key and value."
+ta_nationmeta_help_3: "Add or remove a metadata by key from the nation."
 ta_reload_help_0: "Reloads database."
 ta_reload_help_1: "Reloads config."
 ta_reload_help_2: "Reloads language files."
@@ -421,7 +427,7 @@ msg_payed_resident_tax: '&b繳納個人所得稅 '
 msg_bankrupt_town: ' 銀行資金不足以維持城鎮的日常開銷。'
 msg_bankrupt_nation: ' 銀行資金不足以維持國家的日常開銷。'
 msg_nation_not_peaceful: '&b國家無法維持和平狀態。'
-msg_nation_cant_peaceful: '&b國家支付不起維持和平的費用。'
+msg_nation_cant_peaceful: '&bNation couldn''t afford to become a peaceful nation. You must be able to pay % daily.'
 msg_peaceful_disabled: '&b所有國家的和平都已被打破。'
 msg_you_paid: '&b您花費了%s來保持戰時和平。'
 msg_nation_set_peace: '&b成功改變國家狀態。'
@@ -1088,6 +1094,12 @@ msg_err_key_cannot_be_deleted: '無法移除不存在的Key！'
 msg_err_this_town_doesnt_have_any_associated_metadata: '這個城鎮沒有相關的元資料。'
 msg_err_key_x_is_not_part_of_this_town: 'Key%s不是這個城鎮的一部分。'
 msg_custom_data_was_successfully_added_to_town: '成功加入自定義資料到城鎮內！'
+msg_err_this_resident_doesnt_have_any_associated_metadata: 'This resident doesn''t have any associated metadata.'
+msg_err_key_x_is_not_part_of_this_resident: 'Key %s is not part of this resident, if possible please add it.'
+msg_custom_data_was_successfully_added_to_resident: 'Custom data was successfully added to resident!'
+msg_err_this_nation_doesnt_have_any_associated_metadata: 'This nation doesn''t have any associated metadata.'
+msg_err_key_x_is_not_part_of_this_nation: 'Key %s is not part of this nation, if possible please add it.'
+msg_custom_data_was_successfully_added_to_nation: 'Custom data was successfully added to nation!'
 msg_error_too_many_pages: '頁數過多。'
 msg_err_location_is_not_within_a_town: '該地點不在城鎮內。'
 msg_err_location_is_not_within_a_jail_plot: '該地點不在監獄內。'
@@ -1463,7 +1475,7 @@ msg_resident_has_not_played_long_enough_to_be_jailed: '%s還沒嚴重到需要�
 msg_town_not_peaceful: '&b城鎮無法維持其和平狀態。'
 msg_town_already_peaceful: '&城鎮目前處於和平狀態。'
 msg_town_already_not_peaceful: '&城鎮目前處於非和平狀態。'
-msg_town_cant_peaceful: '&b城鎮無法使其成為和平的地方。'
+msg_town_cant_peaceful: '&bTown couldn''t afford to become a peaceful town. You need to be able to pay %s per day.'
 msg_town_paid_for_neutral_status: '&b您的城鎮花費%s以維持其和平狀態。'
 msg_nation_paid_for_neutral_status: '&b您的國家花費%s以維持其和平狀態。'
 your_town_has_been_invited_to_join_nation: '您的城鎮受邀加入此國家：%s'
@@ -2026,7 +2038,26 @@ msg_town_sell_confirmation: "This will put your town up for sale for %s. Are you
 msg_town_buytown_already_mayor: "You are already mayor of %s."
 msg_town_buytown_confirmation: "Buying %s will cost %s and remove you from any town you may currently be a part of. Are you sure you want to continue?"
 msg_town_buytown_not_forsale: "Specified town is not for sale."
+msg_town_buytown_ruined: "Ruined towns cannot be bought."
 msg_resident_about_reset: "&bResident about reset."
 msg_err_invalid_string_about_not_set: "Invalid string, resident about not set."
 msg_set_about: "%s's about was set to %s."
 msg_clear_about: "%s's about was cleared."
+#Message shown when toggling town visibleontoplists setting
+msg_town_visibleontoplist_setting_set_to: 'The town %s has had their visible-on-top-lists setting set to %s.'
+#Message shown when an admin overrides a town founding date via townyadmin.
+townyadmin_town_set_help_0: "Sets the founding date of a town."
+townyadmin_nation_set_help_0: "Sets the founding date of a nation."
+msg_town_registered_set: "Founding date of town: '%s' set to: '%s'."
+msg_nation_registered_set: "Founding date of nation: '%s' set to: '%s'."
+msg_err_time_cannot_be_in_the_future: "Specified time cannot be in the future."
+#The format used for the /t say and /n say commands.
+town_say_format: "%s says: %s"
+msg_err_floodfill_not_in_wild: "You cannot use floodfill while standing in a claimed area."
+msg_err_floodfill_out_of_bounds: "Claim shape must be fully closed off in order to floodfill."
+msg_err_floodfill_cannot_contain_towns: "Flood fill selection must not contain other towns."
+#Message shown when a resident is an NPC and is not allowed to do something.
+msg_err_resident_is_npc: "You cannot do this to an NPC resident."
+#Message shown when a resident doesn't own any land and the /res plotlist command is used.
+msg_err_resident_doesnt_own_any_land: "The resident does not own any land personally."
+msg_unnamed: "Unnamed"

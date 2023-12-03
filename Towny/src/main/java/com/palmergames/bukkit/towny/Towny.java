@@ -68,7 +68,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandMap;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -79,7 +78,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -568,22 +566,6 @@ public class Towny extends JavaPlugin {
 		return errors;
 	}
 
-	/**
-	 * @deprecated since 0.98.4.19.
-	 */
-	@Deprecated
-	public boolean isCitizens2() {
-		return false;
-	}
-
-	/**
-	 * @deprecated since 0.98.4.19.
-	 */
-	@Deprecated
-	public boolean isPAPI() {
-		return false;
-	}
-
 	public World getServerWorld(String name) throws NotRegisteredException {
 		World world = BukkitTools.getWorld(name);
 		
@@ -803,14 +785,10 @@ public class Towny extends JavaPlugin {
 		commands.add(new DenyCommand(TownySettings.getDenyCommand()));
 		commands.add(new ConfirmCommand(TownySettings.getConfirmCommand()));
 		commands.add(new CancelCommand(TownySettings.getCancelCommand()));
+
 		try {
-			final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-
-			bukkitCommandMap.setAccessible(true);
-			CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-
-			commandMap.registerAll("towny", commands);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
+			BukkitTools.getCommandMap().registerAll("towny", commands);
+		} catch (ReflectiveOperationException e) {
 			throw new TownyInitException("An issue has occurred while registering custom commands.", TownyInitException.TownyError.OTHER, e);
 		}
 	}
@@ -878,14 +856,6 @@ public class Towny extends JavaPlugin {
 
 	public static boolean isMinecraftVersionStillSupported() {
 		return MinecraftVersion.CURRENT_VERSION.isNewerThanOrEquals(MinecraftVersion.OLDEST_VERSION_SUPPORTED);
-	}
-	
-	/**
-	 * @deprecated since 0.98.1.1. Towny will only support 1.16 and newer going forward.
-	 */
-	@Deprecated
-	public static boolean is116Plus() {
-		return true;
 	}
 
 	@ApiStatus.Internal

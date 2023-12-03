@@ -9,6 +9,7 @@ import com.palmergames.bukkit.towny.command.BaseCommand;
 import com.palmergames.bukkit.towny.confirmations.Confirmation;
 import com.palmergames.bukkit.towny.event.TownAddResidentEvent;
 import com.palmergames.bukkit.towny.event.TownRemoveResidentEvent;
+import com.palmergames.bukkit.towny.event.TownyObjectFormattedNameEvent;
 import com.palmergames.bukkit.towny.event.resident.ResidentToggleModeEvent;
 import com.palmergames.bukkit.towny.event.town.TownPreRemoveResidentEvent;
 import com.palmergames.bukkit.towny.exceptions.AlreadyRegisteredException;
@@ -50,6 +51,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -89,6 +91,20 @@ public class Resident extends TownyObject implements InviteReceiver, EconomyHand
 	public Resident(String name) {
 		super(name);
 		permissions.loadDefault(this);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == this)
+			return true;
+		if (!(other instanceof Resident otherResident))
+			return false;
+		return this.getName().equals(otherResident.getName()); // TODO: Change this to UUID when the UUID database is in use.
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getUUID(), getName());
 	}
 
 	public void setLastOnline(long lastOnline) {
@@ -295,7 +311,10 @@ public class Resident extends TownyObject implements InviteReceiver, EconomyHand
 	}
 	
 	public void removeTown() {
-		
+		removeTown(false);
+	}
+
+	public void removeTown(boolean townDeleted) {
 		if (!hasTown())
 			return;
 
@@ -323,7 +342,8 @@ public class Resident extends TownyObject implements InviteReceiver, EconomyHand
 		try {
 			town.removeResident(this);
 		} catch (EmptyTownException e) {
-			TownyUniverse.getInstance().getDataSource().removeTown(town, false);
+			if (!townDeleted)
+				TownyUniverse.getInstance().getDataSource().removeTown(town, false);
 		} catch (NotRegisteredException ignored) {}
 
 		try {
@@ -808,7 +828,11 @@ public class Resident extends TownyObject implements InviteReceiver, EconomyHand
 		String postfix = Colors.translateColorCodes(hasSurname() ? " " + getSurname() : 
 			(isKing() && !TownySettings.getKingPostfix(this).isEmpty()) ? TownySettings.getKingPostfix(this) : 
 				(isMayor() && !TownySettings.getMayorPostfix(this).isEmpty()) ? TownySettings.getMayorPostfix(this) : "");
-		return prefix + getName() + postfix;
+
+		TownyObjectFormattedNameEvent event = new TownyObjectFormattedNameEvent(this, prefix, postfix);
+		BukkitTools.fireEvent(event);
+
+		return event.getPrefix() + getName() + event.getPostfix();
 	}
 
 	/**
@@ -964,18 +988,6 @@ public class Resident extends TownyObject implements InviteReceiver, EconomyHand
 		return BukkitTools.isOnline(getName());
 	}
 
-	@Deprecated // Sometime during 0.98.*.*
-	@ApiStatus.ScheduledForRemoval
-	public int getRespawnProtectionTaskID() {
-		return -1;
-	}
-
-	@Deprecated // Sometime during 0.98.*.*
-	@ApiStatus.ScheduledForRemoval
-	public void setRespawnProtectionTaskID(int respawnProtectionTaskID) {
-		
-	}
-	
 	public boolean hasRespawnProtection() {
 		return this.respawnProtectionTask != null && !this.respawnProtectionTask.isCancelled();
 	}

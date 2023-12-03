@@ -9079,3 +9079,160 @@ v0.92.0.11:
   - Bump mockbukkit to 3.21.0.
   - Fix tourist-blacklisted commands not being usable in the wilderness.
   - Fix seeing an errant permission string when running a /res toggle addon command.
+0.99.5.19:
+  - Update PowerRanks warning to mention their version that fixes the incompatibility.
+  - API: Added TownyObjectFormattedNameEvent
+    - Thrown when a Resident, Town or Nation is returning a getFormattedName() value.
+    - This is used to alter the prefix or postfix that flanks a TownyObject name, usually a title, surname, townlevel/nationlevel prefix/postfix.
+    - Closes #6995.
+  - Add the ability to hide towns from the /towny top and /t list by commands (as well as the PAPIPlaceholders.)
+    - Closes #6996.
+  - New Command: /ta town TOWNNAME toggle visibleontoplists [on|off]
+    - Used by an admin to toggle a town's visiblity on the /towny top, /t list by commands (as well as the PAPIPlaceholders.)
+  - Bump org.apache.commons:commons-compress from 1.23.0 to 1.24.0.
+  - Bump org.apache.maven.plugins:maven-javadoc-plugin from 3.5.0 to 3.6.0.
+  - Bump com.github.seeseemelk:MockBukkit-v1.20 from 3.21.0 to 3.22.0.
+0.99.5.20:
+  - Fix /plot info throwing NPE when using_economy is false.
+    - Closes #7000.
+  - Add hasTranslation method, courtesy of Warrior with PR #7001.
+0.99.5.21:
+  - Add new townyadmin commands for controlling resident and nation metadata when it is Globally registered metadata.
+    - /ta nation NAME meta set [key] [value]
+    - /ta nation NAME meta add|remove [key]
+    - /ta resident NAME meta set [key] [value]
+    - /ta resident NAME meta set add|remove [key]
+    - Closes #7015.
+  - Bump adventure platform bukkit to 4.3.1, courtesy of Warrior with PR #7010.
+    - Adds 1.20.2 support.
+  - Fix unclaim all message missing color/prefix, courtesy of Warrior with PR #7014.
+  - Add utility for getting the bukkit command map, courtesy of Warrior with PR #7011.
+  - Bump me.clip:placeholderapi from 2.11.3 to 2.11.4.
+  - Bump org.apache.maven.plugins:maven-shade-plugin from 3.5.0 to 3.5.1.
+  - Bump net.coreprotect:coreprotect from 22.1 to 22.2.
+0.99.6.0:
+  - Bump version number for release.
+0.99.6.1:
+  - Reset a player's cache when they change gamemodes.
+  - Reset a player's cache when they are op'd or deop'd.
+  - Fix unneeded permission test in /n list command.
+  - Allow Towny admins to bypass PvP damage prevention, courtesy of ImperialSam12 with PR #7013. (First-Time Contributor!)
+  - API: Add boolean for if claim is from takeoverclaim to TownPreClaimEvent, courtesy of Fruitloopins with PR #7023.
+  - Fix support for Vanished players on servers using PremiumVanish and MC versions older than 1.19.3.
+0.99.6.2:
+  - Add ability for admins to edit town/nation founding dates, courtesy of Articdive with PR #6904.
+    - Using New Commands: /ta town [townname] set foundingdate [unix timestamp] & /ta nation [nationname] set foundingdate [unix timestamp]
+    - Closes #6471.
+  - New Command: /ta town [townname] set foundingdate [unix timestamp]
+    - Sets a town's founding date to the given time, use https://www.unixtimestamp.com/ to get a suitable timestamp number.
+    - Requires towny.command.townyadmin.town.set.foundingdate.
+  - New Command: /ta nation [nationname] set foundingdate [unix timestamp]
+    - Sets a nation's founding date to the given time, use https://www.unixtimestamp.com/ to get a suitable timestamp number.
+    - Requires towny.command.townyadmin.nation.set.foundingdate.
+  - New Permission Node: towny.command.townyadmin.town.set.foundingdate
+    - A child node of towny.command.townyadmin.town.set.*, which is in turn a child node of towny.command.townyadmin.town.*.
+    - No changes to townyperms.yml required, admins will inherit this from towny.admin.
+  - New Permission Node: towny.command.townyadmin.nation.set.foundingdate
+    - A child node of towny.command.townyadmin.nation.set.*, which is in turn a child node of towny.command.townyadmin.nation.*.
+    - No changes to townyperms.yml required, admins will inherit this from towny.admin.
+  - New Config Option: global_nation_settings.nation_level_is_determined_by_town_count_instead_of_resident_count
+    - Default: false
+    - When set to true, the nation's NationLevel is determined by the number of towns in the nations, instead of the number of residents.
+  - API: Added NationCalculateNationLevelNumberEvent, an event thrown when Towny decides what NationLevel number a Nation will have, which ultimately decides which NationLevel the Nation receives.
+    - Useful for plugins that want to artifically increase or decrease a Nation's NationLevel.
+  - Handle tamed wolves who are in pvp-enabled areas, being able to be shot from pvp-disabled areas.
+    - Closes #6983.
+  - New Command: /plot set outpost spawn
+    - Sets the spawn point inside of an existing outpost plot to where the player is standing.
+    - An alias of the older command /t set outpost.
+    - Closes #6998.
+0.99.6.3:
+  - Fix the purchased block calculation not taking into account a town which has already hit the max price.
+  - Make all negative purchased blocks prices count as disabled, courtesy of Warrior with PR #7034.
+  - Fix towns being deleted causing a second (pointless) town deletion when the last resident is removed.
+  - Refactor TownLevel calculation to include a new API event and reflow.
+  - API: Added TownCalculateTownLevelNumberEvent, an event thrown when Towny decides what TownLevel number a Town will have, which ultimately decides which TownLevel the Town receives.
+    - Useful for plugins that want to artifically increase or decrease a Town's TownLevel.
+  - Fix NoClassDefFoundError that appears on 1.16.5 servers when /t outpost list is used.
+    - Closes #7037.
+0.99.6.4:
+  - Make it clearer when a message is sent via the /t say and /n say commands.
+  - Fix un-changed townblocks with custom plot types not having their permissions altered by the /t set perm command.
+    - Closes #7043.
+  - Add projectile breaking protection for dripstone & pots, courtesy of Warrior with PR #7040.
+  - Make status screen sending respect the async eco setting, courtesy of Warrior with PR #7038.
+  - Add new switches from 23w41a and 23w42a, courtesy of Warrior with PR #7042.
+  - Add floodfill claim command, courtesy of Warrior with PR #7012.
+  - New Command: /t claim fill
+    - Fills a surrounded section with claims for a town.
+  - New Permission Node: towny.command.town.claim.fill
+    - Child node of towny.command.town.claim.*
+    - No changes to townyperms.yml required.
+0.99.6.5:
+  - Add a listener which will reset the player cache when they are inside of a plot or town which has had their plot permissions change.
+0.100.0.0:
+  - Bump version for release.
+0.100.0.1:
+  - Fix the town-is-deleted message being shown twice.
+  - Fix the draw smoke task being able to load chunks, courtesy of Warrior with PR #7053.
+  - Fix players being able to use hotbar buttons to place items into Towny inventory GUIs, resulting in loss of items.
+    - Closes #7054.
+  - Fix players being able to bypass setting enemy status during cache creation.
+  - Remove everything deprecated between 0.98.0.0 and 0.99.0.0.
+0.100.0.2:
+  - Fix potential ConcurrentModificationException when a town removes an outpost spawn.
+  - Show players who cannot pay the peaceful/neutral costs how much they will need to pay. 
+  - Bump me.clip:placeholderapi from 2.11.4 to 2.11.5.
+  - Bump org.apache.commons:commons-text from 1.10.0 to 1.11.0.
+  - Bump org.apache.logging.log4j:log4j-core from 2.20.0 to 2.21.1.
+  - Bump org.apache.maven.plugins:maven-surefire-plugin from 3.1.2 to 3.2.1.
+  - Bump com.github.seeseemelk:MockBukkit-v1.20 from 3.22.0 to 3.44.0.
+  - Fix /ta town and /ta nation tab completers not using TownyAddonCommandAPI completions when there are too many arguments.
+  - Refactor some TownCommand code to be simpler, more optimized, and reduce redundant code.
+0.100.0.3:
+  - Fix TownyAddonCommandAPI's TownyAdmin Nation Tabcompleter not using the correct command type.
+  - Fix saving nations unnecessarily when a nation is renamed.
+  - Add equals and hashcodes overrides to Resident, Town, Nation & TownyWorld objects.
+  - Prevent ruined towns from being bought, courtesy of Warrior with PR #7073.
+  - Add /res plotlist {name} Command.
+    - A command which shows you the plots which are personally owned by yourself, or by the resident with the given name.
+    - Location, town, plottype and plot name are all shown.
+    - When it is used by an Admin, they also gain the ability to click on the list to teleport to the plots as long as they possess the towny.command.townyadmin.tpplot permission node.
+    - Closes #7075.
+  - New Permission Node: towny.command.resident.plotlist
+    - Child nodes of towny.commmand.resident.*
+    - No changes required to be made to the townyperms.yml.
+  - New Command: /res plotlist {#} - Shows a player their own list of plots, with an optional page number.
+  - New Command: /res plotlist [name] {#} - Shows a a list of plots for the given player name, with an optional page number.
+  - Bump com.zaxxer:HikariCP from 5.0.1 to 5.1.0.
+  - Bump org.junit.jupiter:junit-jupiter from 5.10.0 to 5.10.1.
+  - Bump org.junit.jupiter:junit-jupiter-api from 5.10.0 to 5.10.1.
+0.100.0.4:
+  - Fix new TownyObject equals methods using UUIDs, something to undo once the UUID db is adopted.
+  - Remove two cases of == equality check for residents, courtesy of Warrior with PR #7084.
+0.100.0.5:
+  - Fix page navigation from list footers in the plotgrouplist and plotlist screens.
+    - Closes #7089.
+  - Fix regression: the /t invite {playername} not working as of 0.100.0.2. 
+  - Add Confirmation to /t set mayor command.
+    - Closes #7092.
+  - Fix /t set perm commands showing error feedback messages.
+0.100.0.6:
+  - Fix outposts being counted wrong in town merge vetting code.
+    - Closes #7099.
+  - Refactor KeepInventory and KeepExperience code.
+    - Unblocks https://github.com/TownyAdvanced/SiegeWar/pull/845.
+  - Immediately schedule upcoming newday on paper servers, courtesy of Warrior with PR #7101.
+  - Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.1 to 3.2.2.
+  - Bump org.apache.maven.plugins:maven-javadoc-plugin from 3.6.0 to 3.6.2.
+  - Bump org.jetbrains:annotations from 24.0.1 to 24.1.0.
+  - Bump com.github.seeseemelk:MockBukkit-v1.20 from 3.44.0 to 3.47.0.
+  - Bump org.apache.commons:commons-compress from 1.24.0 to 1.25.0
+0.100.0.7:
+  - Fix manually-set town levels not returning the correct TownLevel.
+    - Closes #7103.
+0.100.0.8:
+  - New Config Option: town.max_buytown_price
+    - Default: 999999999
+    - The Maximum price that a town can be put for sale at.
+    - This refers to the price that someone could pay if they ran /t buytown, to buy a town that has been put up for sale.

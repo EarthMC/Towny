@@ -136,21 +136,23 @@ public class CombatUtil {
 		 */
 		if (attackingPlayer != null && isNotNPC(attackingPlayer)) {
 
-			boolean cancelled = false;
-			
 			/*
 			 * Defender is a player, which is not an NPC..
 			 */
 			if (defendingPlayer != null && isNotNPC(defendingPlayer)) {
-				
+
+				boolean cancelled = false;
+
 				/*
-				 * Both townblocks are not Arena plots.
+				 * Both townblocks are not Arena plot and Player is not considered an Admin by Towny.
+				 * Arena plots never prevent pvp, admins are never prevented from pvping.
 				 */
-				if (!isArenaPlot(attackerTB, defenderTB)) {
+				if (!isArenaPlot(attackerTB, defenderTB) && !isTownyAdmin(attackingPlayer)) {
 					/*
 					 * Check if we are preventing friendly fire between allies
-					 * Check the attackers TownBlock and it's Town for their PvP status, else the world.
-					 * Check the defenders TownBlock and it's Town for their PvP status, else the world.
+					 * Check the attackers TownBlock for its PvP status, else the world.
+					 * Check the defenders TownBlock for its PvP status, else the world.
+					 * Check whether this involves someone who is jailed and in a Jail plot. 
 					 */
 					cancelled = preventFriendlyFire(attackingPlayer, defendingPlayer, world) || preventPvP(world, attackerTB) || preventPvP(world, defenderTB) || preventJailedPVP(defendingPlayer, attackingPlayer);
 				}
@@ -202,7 +204,14 @@ public class CombatUtil {
 					if (EntityTypeUtil.isProtectedEntity(defendingEntity))
 						return !TownyActionEventExecutor.canDestroy(attackingPlayer, defendingEntity.getLocation(), Material.DIRT);
 				}
-				
+
+				/*
+				 * Special wolf scenario to prevent players sniping tamed wolves outside of town, while in non-pvp areas.
+				 */
+				if (defenderTB == null && defendingEntity instanceof Wolf wolf && wolf.isTamed() && !isOwner(wolf, attackingPlayer)) {
+					return preventPvP(world, attackerTB) || preventPvP(world, defenderTB);
+				}
+
 				/*
 				 * Protect specific entity interactions (faked with Materials).
 				 * Requires destroy permissions in either the Wilderness or in Town-Claimed land.
@@ -235,7 +244,6 @@ public class CombatUtil {
 				 * Prevent pvp and remove Wolf targeting.
 				 */
 				if (attackingEntity instanceof Wolf wolf && (preventPvP(world, attackerTB) || preventPvP(world, defenderTB))) {
-					wolf.setTarget(null);
 					wolf.setAngry(false);
 					return true;
 				}
@@ -280,7 +288,6 @@ public class CombatUtil {
 						Player owner = BukkitTools.getPlayerExact(wolf.getOwner().getName());
 						return !PlayerCacheUtil.getCachePermission(owner, defendingEntity.getLocation(), Material.AIR, ActionType.DESTROY);
 					} else {
-						wolf.setTarget(null);
 						wolf.setAngry(false);
 						return true;
 					}
@@ -701,5 +708,9 @@ public class CombatUtil {
 		} catch (Throwable thr) {
 			return null;
 		}
+	}
+
+	private static boolean isTownyAdmin(Player attackingPlayer) {
+		return TownyUniverse.getInstance().getPermissionSource().isTownyAdmin(attackingPlayer);
 	}
 }

@@ -197,6 +197,9 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 					if (args.length == 2) {
 						return NameUtil.filterByStart(TownyCommandAddonAPI.getTabCompletes(CommandType.PLOT_SET, getPlotSetCompletions()), args[1]);
 					}
+					if (args.length == 3 && args[1].equalsIgnoreCase("outpost")) {
+						return Arrays.asList("spawn");
+					}
 					if (args.length > 2 && args[1].equalsIgnoreCase("perm")) {
 						return permTabComplete(StringMgmt.remArgs(args, 2));
 					} else if (args.length > 2 && TownyCommandAddonAPI.hasCommand(CommandType.PLOT_SET, args[1]))
@@ -326,7 +329,7 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 			// Add extra message if the player has permission to evict 
 			if (player.hasPermission(PermissionNodes.TOWNY_COMMAND_PLOT_EVICT.getNode())) {
 				try {
-					plotTestOwner(resident, selection.get(0).getTownBlock());
+					TownyAPI.getInstance().testPlotOwnerOrThrow(resident, townBlock);
 					message.append(Translatable.of("msg_plot_claim_consider_evict_instead"));
 				} catch (TownyException ignored) {}
 			}
@@ -538,7 +541,8 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 		case "outpost":
 			checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_CLAIM_OUTPOST.getNode());
 			TownyAPI.getInstance().testPlotOwnerOrThrow(resident, townBlock); // Test we are allowed to work on this plot
-			parsePlotSetOutpost(player, resident, townBlock);
+			boolean spawn = split.length == 2 && split[1].equalsIgnoreCase("spawn");
+			parsePlotSetOutpost(player, resident, townBlock, spawn);
 			break;
 		default:
 			if (tryPlotSetAddonCommand(player, split))
@@ -621,14 +625,26 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 		return false;
 	}
 
-	public void parsePlotSetOutpost(Player player, Resident resident, TownBlock townBlock) throws TownyException {
+	public void parsePlotSetOutpost(Player player, Resident resident, TownBlock townBlock, boolean spawn) throws TownyException {
 		if (!TownySettings.isAllowingOutposts()) 
 			throw new TownyException(Translatable.of("msg_outpost_disable"));
 
 		Town town = townBlock.getTownOrNull();
+
+		if (spawn) {
+			checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_SET_OUTPOST.getNode());
+
+			if (!townBlock.isOutpost())
+				throw new TownyException(Translatable.of("msg_err_location_is_not_within_an_outpost_plot"));
+
+			town.addOutpostSpawn(player.getLocation());
+			TownyMessaging.sendMsg(player, Translatable.of("msg_set_outpost_spawn"));
+			return;
+		}
+
 		TownyWorld townyWorld = townBlock.getWorld();
 		Coord key = Coord.parseCoord(player.getLocation());
-		
+
 		if (OutpostUtil.OutpostTests(town, resident, townyWorld, key, resident.isAdmin(), true)) {
 			// Test if they can pay.
 			if (TownyEconomyHandler.isActive() && !town.getAccount().canPayFromHoldings(TownySettings.getOutpostCost())) 
@@ -1975,19 +1991,5 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 			throw new TownyException(Translatable.of("msg_err_plot_not_associated_with_a_group"));
 		
 		return townBlock.getPlotObjectGroup();
-	}
-
-	/**
-	 * Test the townBlock to ensure we are either the plot owner, or the
-	 * mayor/assistant, or a TownyAdmin.
-	 * 
-	 * @param resident Resident Object.
-	 * @param townBlock TownBlock Object.
-	 * @throws TownyException Exception thrown to trigger failures in the methods using this method.
-	 * @deprecated since 0.98.4.5 use {@link TownyAPI#testPlotOwnerOrThrow(Resident, TownBlock)} instead.
-	 */
-	@Deprecated
-	public static void plotTestOwner(Resident resident, TownBlock townBlock) throws TownyException {
-		TownyAPI.getInstance().testPlotOwnerOrThrow(resident, townBlock);
 	}
 }

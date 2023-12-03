@@ -8,8 +8,6 @@ import com.palmergames.bukkit.towny.TownyTimerHandler;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.event.BedExplodeEvent;
 import com.palmergames.bukkit.towny.event.PlayerChangePlotEvent;
-import com.palmergames.bukkit.towny.event.PlayerEnterTownEvent;
-import com.palmergames.bukkit.towny.event.PlayerLeaveTownEvent;
 import com.palmergames.bukkit.towny.event.executors.TownyActionEventExecutor;
 import com.palmergames.bukkit.towny.event.player.PlayerDeniedBedUseEvent;
 import com.palmergames.bukkit.towny.event.player.PlayerEntersIntoTownBorderEvent;
@@ -47,6 +45,8 @@ import com.palmergames.util.JavaUtil;
 import com.palmergames.util.StringMgmt;
 
 import io.papermc.lib.PaperLib;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -76,6 +76,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -914,13 +915,9 @@ public class TownyPlayerListener implements Listener {
 		if (to.isWilderness()) {
 			// Gone from a Town into the wilderness.
 			BukkitTools.fireEvent(new PlayerExitsFromTownBorderEvent(event.getPlayer(), to, from, from.getTownOrNull(), event.getMoveEvent()));
-			// Old event which will be removed later on.
-			BukkitTools.fireEvent(new PlayerLeaveTownEvent(event.getPlayer(), to, from, from.getTownOrNull(), event.getMoveEvent()));
 		} else if (from.isWilderness()) {
 			// Gone from wilderness into Town.
 			BukkitTools.fireEvent(new PlayerEntersIntoTownBorderEvent(event.getPlayer(), to, from, to.getTownOrNull(), event.getMoveEvent()));
-			// Old event which will be removed later on.
-			BukkitTools.fireEvent(new PlayerEnterTownEvent(event.getPlayer(), to, from, to.getTownOrNull(), event.getMoveEvent()));
 		// Both to and from have towns.
 		} else if (to.getTownOrNull().equals(from.getTownOrNull())) {
 			// The towns are the same, no event will fire.
@@ -929,9 +926,6 @@ public class TownyPlayerListener implements Listener {
 			// Player has left one Town and immediately entered a different one.
 			BukkitTools.fireEvent(new PlayerEntersIntoTownBorderEvent(event.getPlayer(), to, from, to.getTownOrNull(), event.getMoveEvent()));
 			BukkitTools.fireEvent(new PlayerExitsFromTownBorderEvent(event.getPlayer(), to, from, from.getTownOrNull(), event.getMoveEvent()));
-			// Old events which will be removed later on.
-			BukkitTools.fireEvent(new PlayerEnterTownEvent(event.getPlayer(), to, from, to.getTownOrNull(), event.getMoveEvent()));
-			BukkitTools.fireEvent(new PlayerLeaveTownEvent(event.getPlayer(), to, from, from.getTownOrNull(), event.getMoveEvent()));
 		}
 	}
 	
@@ -957,8 +951,7 @@ public class TownyPlayerListener implements Listener {
 	}
 
 	/**
-	 * onPlayerDieInTown
-	 * - Handles death events and the KeepInventory/KeepLevel options are being used.
+	 * - Handles the KeepInventory/KeepLevel aspects of Towny's feature-set.
 	 * - Throws API events which can allow other plugins to cancel Towny saving
 	 *   inventory and/or experience.
 	 * 
@@ -967,47 +960,23 @@ public class TownyPlayerListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.HIGHEST)
 	// Why Highest??, so that we are the last ones to check for if it keeps their inventory, and then have no problems with it.
-	public void onPlayerDieInTown(PlayerDeathEvent event) {
+	public void onPlayerDeathHandleKeepLevelAndInventory(PlayerDeathEvent event) {
 		Resident resident = TownyAPI.getInstance().getResident(event.getEntity());
-		TownBlock tb = TownyAPI.getInstance().getTownBlock(event.getEntity().getLocation());
-		if (resident == null || tb == null)
+		if (resident == null)
 			return;
-		boolean keepInventory = event.getKeepInventory();
-		boolean keepLevel = event.getKeepLevel();
-		if (TownySettings.getKeepExperienceInTowns() && !keepLevel)
-			keepLevel = tryKeepExperience(event);
-		
-		if (TownySettings.getKeepInventoryInTowns() && !keepInventory)
-			keepInventory = tryKeepInventory(event);
-		
-		if (resident.hasTown() && !keepInventory) {
-			Town town = resident.getTownOrNull();
-			Town tbTown = tb.getTownOrNull();
-			if (TownySettings.getKeepInventoryInOwnTown() && tbTown.equals(town))
-				keepInventory = tryKeepInventory(event);
-			if (TownySettings.getKeepInventoryInAlliedTowns() && !keepInventory && tbTown.isAlliedWith(town))
-				keepInventory = tryKeepInventory(event);
-		}
-		
-		if (TownySettings.getKeepInventoryInArenas() && !keepInventory && tb.getType() == TownBlockType.ARENA)
-			tryKeepInventory(event);
-		
-		if (TownySettings.getKeepExperienceInArenas() && !keepLevel && tb.getType() == TownBlockType.ARENA)
-			tryKeepExperience(event);
+
+		TownBlock tb = TownyAPI.getInstance().getTownBlock(event.getEntity().getLocation());
+
+		/* Handle Inventory Keeping with our own PlayerKeepsInventoryEvent. */
+		tryKeepInventory(event, resident, tb);
+
+		/* Handle Experience Keeping with our own PlayerKeepsExperienceEvent. */
+		tryKeepExperience(event, tb);
 	}
 
-	private boolean tryKeepExperience(PlayerDeathEvent event) {
-		PlayerKeepsExperienceEvent pkee = new PlayerKeepsExperienceEvent(event);
-		if (!BukkitTools.isEventCancelled(pkee)) {
-			event.setKeepLevel(true);
-			event.setDroppedExp(0);
-			return true;
-		}
-		return false;
-	}
-
-	private boolean tryKeepInventory(PlayerDeathEvent event) {
-		PlayerKeepsInventoryEvent pkie = new PlayerKeepsInventoryEvent(event);
+	private boolean tryKeepInventory(PlayerDeathEvent event, Resident resident, TownBlock tb) {
+		boolean keepInventory = getKeepInventoryValue(event.getKeepInventory(), resident, tb);
+		PlayerKeepsInventoryEvent pkie = new PlayerKeepsInventoryEvent(event, keepInventory);
 		if (!BukkitTools.isEventCancelled(pkie)) {
 			event.setKeepInventory(true);
 			event.getDrops().clear();
@@ -1016,6 +985,58 @@ public class TownyPlayerListener implements Listener {
 		return false;
 	}
 
+	private boolean getKeepInventoryValue(boolean keepInventory, Resident resident, TownBlock tb) {
+		// Run it this way so that we will override a plugin that has kept the
+		// inventory, but they're in the wilderness where we don't want to keep
+		// inventories.
+		// Sometimes we keep the inventory when they are in any town.
+		keepInventory = TownySettings.getKeepInventoryInTowns() && tb != null;
+
+		// All of the other tests require a town.
+		if (tb == null)
+			return keepInventory;
+
+		if (resident.hasTown() && !keepInventory) {
+			Town town = resident.getTownOrNull();
+			Town tbTown = tb.getTownOrNull();
+			// Sometimes we keep the inventory only when they are in their own town.
+			if (TownySettings.getKeepInventoryInOwnTown() && tbTown.equals(town))
+				keepInventory = true;
+			// Sometimes we keep the inventory only when they are in a Town that considers them an ally.
+			if (TownySettings.getKeepInventoryInAlliedTowns() && !keepInventory && tbTown.isAlliedWith(town))
+				keepInventory = true;
+		}
+
+		// Sometimes we keep the inventory when they are in an Arena plot.
+		if (TownySettings.getKeepInventoryInArenas() && !keepInventory && tb.getType() == TownBlockType.ARENA)
+			keepInventory = true;
+
+		return keepInventory;
+	}
+
+	private boolean tryKeepExperience(PlayerDeathEvent event, TownBlock tb) {
+		boolean keepExperience = getKeepExperienceValue(tb != null, tb != null ? tb.getType() : null); 
+		PlayerKeepsExperienceEvent pkee = new PlayerKeepsExperienceEvent(event, keepExperience);
+		if (!BukkitTools.isEventCancelled(pkee)) {
+			event.setKeepLevel(true);
+			event.setDroppedExp(0);
+			return true;
+		}
+		return false;
+	}
+
+	private boolean getKeepExperienceValue(boolean inTown, TownBlockType type) {
+		// We never keep experience in the wilderness.
+		if (!inTown)
+			return false;
+
+		// We sometimes keep experience if its in town.
+		if (TownySettings.getKeepExperienceInTowns())
+			return true;
+
+		// We sometimes keep experience in Arena Plots.
+		return type != null && type == TownBlockType.ARENA && TownySettings.getKeepExperienceInArenas();
+	}
 
 	/**
 	 * PlayerEnterTownEvent
@@ -1129,7 +1150,9 @@ public class TownyPlayerListener implements Listener {
 	public void onPlayerUsesCommand(PlayerCommandPreprocessEvent event) {
 		if (plugin.isError() || !TownyAPI.getInstance().isTownyWorld(event.getPlayer().getWorld()))
 			return;
-		
+
+		checkForOpDeOpCommand(event);
+
 		Resident resident = TownyUniverse.getInstance().getResident(event.getPlayer().getUniqueId());
 
 		// More than likely another plugin using a fake player to run a command or,
@@ -1154,6 +1177,31 @@ public class TownyPlayerListener implements Listener {
 		final TownBlock townBlock = TownyAPI.getInstance().getTownBlock(event.getPlayer());
 		if (blockOutlawedPlayerCommand(event.getPlayer(), resident, townBlock, command) || blockCommandInsideTown(event.getPlayer(), resident, townBlock, command))
 			event.setCancelled(true);
+	}
+
+	private void checkForOpDeOpCommand(PlayerCommandPreprocessEvent event) {
+		String[] args = CommandList.normalizeCommand(event.getMessage()).split(" ");
+		String command = args[0];
+		// Fail early if we aren't looking at /op|deop [playername]
+		if ((!command.equalsIgnoreCase("op") && !command.equalsIgnoreCase("deop")) || args.length != 2)
+			return;
+
+		// Get the target.
+		Player target = Bukkit.getPlayer(args[1]);
+		if (target == null || !target.isOnline())
+			return;
+
+		// Make sure they have the permission to run the command.
+		if (!event.getPlayer().hasPermission("minecraft.command." + command))
+			return;
+
+		// Make sure they're not running the command which will have no effect.
+		if (target.isOp() == "op".equalsIgnoreCase(command))
+			return;
+
+		// Delete the online player's cache because they have been op'd or deop'd.
+		Towny plugin = Towny.getPlugin();
+		plugin.getScheduler().runLater(target, () -> plugin.deleteCache(target), 1L);
 	}
 
 	public boolean blockWarPlayerCommand(Player player, Resident resident, String command) {
@@ -1392,7 +1440,14 @@ public class TownyPlayerListener implements Listener {
 			}
 		}
 	}
-	
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void onPlayerChangeGameMode(PlayerGameModeChangeEvent event) {
+		if (!TownyAPI.getInstance().isTownyWorld(event.getPlayer().getWorld()))
+			return;
+		Towny.getPlugin().deleteCache(event.getPlayer());
+	}
+
 	private void loadBlockedCommandLists() {
 		this.blockedJailCommands = new CommandList(TownySettings.getJailBlacklistedCommands());
 		this.blockedTouristCommands = new CommandList(TownySettings.getTouristBlockedCommands());
