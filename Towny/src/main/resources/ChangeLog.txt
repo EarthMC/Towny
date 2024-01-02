@@ -9316,3 +9316,46 @@ v0.92.0.11:
     - A cancellable event which is fired before a town becomes unsanctioned.
 0.100.0.14:
   - Fix potential IllegalArgumentException by loading sanctioned towns in a safer way.
+0.100.0.15:
+  - Removed Permission Node: towny.command.town.claim.town.multiple
+    - Towny over the years has made great progress towards making claiming more light weight on the server.
+    - Therefore it makes sense to allow the use of /t claim # and other multi-claiming commands by default.
+  - Update attribution in /towny universe to reflect 2023 stats.
+  - Update Towny/Sponsor plugins list.
+  - Correct townblock reporting in debug messages no one sees.
+  - Make the TownyUniverse code a bit more readable.
+  - Seperate the load and save data sources, courtesy of Warrior with PR #7100.
+    - Fixes a minor memory/connection leak when using mysql, the load datasource is now properly shut down when it's no longer needed and re-used if possible.
+0.100.0.16:
+  - Reorganize the config, creating dedicated sections for Claiming and Spawning.
+    - Existing config.yml's will have ~60 entries moved into their new locations with their settings preserved.
+    - Over 13 years of Towny development there have been many settings added into the section that was a "best-fit".
+    - The creation of Spawning and Claiming section will ease the addition of future settings in these areas.
+  - Bump net.kyori:adventure-text-minimessage from 4.14.0 to 4.15.0.
+  - Bump org.apache.maven.plugins:maven-compiler-plugin from 3.11.0 to 3.12.1.
+  - Bump net.kyori:adventure-text-serializer-plain from 4.14.0 to 4.15.0.
+  - Prevent players of nation-sanctioned towns being able to use /n spawn [nationname].
+0.100.0.17:
+  - Fix creatures-using-stone-pressure-plates config setting being overridden.
+    - Closes #7150.
+  - Add the ability to block claiming in plots which have too much Ocean or otherwise Unwanted biome in them.
+    - Closes #7136.
+  - New Config Option: claiming.biome_rules.unwanted_biomes.enabled
+    - Default: false
+    - When true, unwanted biomes will be tested for when a player is claiming land.
+  - New Config Option: claiming.biome_rules.unwanted_biomes.biomes
+    - Default: "the_end,end_barrens,end_highlands,end_midlands,small_end_islands"
+    - A comma separated list of biome names that will add up towards a townblock's un-claim-ability.
+  - New Config Option: claiming.biome_rules.unwanted_biomes.threshold
+    - Default: 55
+    - The max amount of combined unwanted biomes as a percent, that will be allowed in plots being claimed by towns.
+    - For example, if a townblock would be more than X percent ocean it will not be able to be claimed.
+  - New Config Option: claiming.biome_rules.ocean_blocking.enabled
+    - Default: false
+    - When true, any wilderness plot which has more Ocean biome in it than the allowed threshold (see below,) will not be able to be claimed.
+  - New Config Option: claiming.biome_rules.ocean_blocking.threshold
+    - Default: 55
+    - The max amount of combined ocean biomes as a percent, that will be allowed in plots being claimed by towns.
+    - For example, if a townblock would be more than X percent ocean it will not be able to be claimed.
+0.100.0.18:
+  - Refactor town homeblock proximity tests into new ProximityUtil method.

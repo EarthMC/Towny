@@ -2304,26 +2304,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		if (town.hasHomeBlock() && town.getHomeBlock().getWorldCoord().equals(townBlock.getWorldCoord()))
 			throw new TownyException(Translatable.of("msg_err_homeblock_already_set_here"));
 
-		if (world.hasTowns() &&
-			TownySettings.getMinDistanceFromTownHomeblocks() > 0 || 
-			TownySettings.getMaxDistanceBetweenHomeblocks() > 0 ||
-			TownySettings.getMinDistanceBetweenHomeblocks() > 0) {
-				
-			final int distanceToNextNearestHomeblock = world.getMinDistanceFromOtherTownsHomeBlocks(Coord.parseCoord(player), town);
-			if (distanceToNextNearestHomeblock < TownySettings.getMinDistanceFromTownHomeblocks() ||
-				distanceToNextNearestHomeblock < TownySettings.getMinDistanceBetweenHomeblocks()) 
-				throw new TownyException(Translatable.of("msg_too_close2", Translatable.of("homeblock")));
-
-			if (TownySettings.getMaxDistanceBetweenHomeblocks() > 0 &&
-				distanceToNextNearestHomeblock > TownySettings.getMaxDistanceBetweenHomeblocks())
-				throw new TownyException(Translatable.of("msg_too_far"));
-		}
-		
-		if (TownySettings.getHomeBlockMovementDistanceInTownBlocks() > 0) {
-			double distance = MathUtil.distance(town.getHomeBlock().getCoord(), townBlock.getCoord());
-			if (distance > TownySettings.getHomeBlockMovementDistanceInTownBlocks())
-				throw new TownyException(Translatable.of("msg_err_you_cannot_move_your_homeblock_this_far_limit_is_x_you_are_x", TownySettings.getHomeBlockMovementDistanceInTownBlocks(), Math.floor(distance)));
-		}
+		ProximityUtil.allowTownHomeBlockOrThrow(world, townBlock.getCoord(), town, false);
 
 		BukkitTools.ifCancelledThenThrow(new TownPreSetHomeBlockEvent(town, townBlock, player));
 
@@ -2575,8 +2556,16 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		if (!TownyAPI.getInstance().isWilderness(spawnLocation))
 			throw new TownyException(Translatable.of("msg_already_claimed_1", key));
 
-		if (world.hasTowns())
-			testDistancesOrThrow(world, key);
+		// Check that a town isn't being formed inside of a biome that isn't allowed to be claimed.
+		if (TownySettings.isUnwantedBiomeClaimingEnabled() || TownySettings.isOceanClaimingBlocked()) {
+			List<WorldCoord> selection = Arrays.asList(WorldCoord.parseWorldCoord(spawnLocation));
+			selection = AreaSelectionUtil.filterOutUnwantedBiomeWorldCoords(player, selection);
+			selection = AreaSelectionUtil.filterOutOceanBiomeWorldCoords(player, selection);
+			if (selection.isEmpty())
+				throw new TownyException("msg_err_cannot_begin_town_in_this_biome");
+		}
+
+		ProximityUtil.allowTownHomeBlockOrThrow(world, key, null, true);
 
 		// If the town doesn't cost money to create, just make the Town.
 		if (noCharge || !TownyEconomyHandler.isActive()) {
@@ -2681,37 +2670,6 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		BukkitTools.fireEvent(new NewTownEvent(town));
 
 		return town;
-	}
-
-	private static void testDistancesOrThrow(TownyWorld world, Coord key) throws TownyException {
-		if (TownySettings.getMinDistanceFromTownPlotblocks() > 0 || TownySettings.getNewTownMinDistanceFromTownPlots() > 0) {
-			int minDistance = TownySettings.getNewTownMinDistanceFromTownPlots();
-			if (minDistance <= 0)
-				minDistance = TownySettings.getMinDistanceFromTownPlotblocks();
-			
-			if (world.getMinDistanceFromOtherTownsPlots(key) < minDistance)
-				throw new TownyException(Translatable.of("msg_too_close2", Translatable.of("townblock")));
-		}
-
-		if (TownySettings.getMinDistanceFromTownHomeblocks() > 0 ||
-			TownySettings.getMaxDistanceBetweenHomeblocks() > 0 ||
-			TownySettings.getMinDistanceBetweenHomeblocks() > 0 ||
-			TownySettings.getNewTownMinDistanceFromTownHomeblocks() > 0) {
-			
-			final int distanceToNextNearestHomeblock = world.getMinDistanceFromOtherTownsHomeBlocks(key);
-			
-			int minDistance = TownySettings.getNewTownMinDistanceFromTownHomeblocks();
-			if (minDistance <= 0)
-				minDistance = TownySettings.getMinDistanceFromTownHomeblocks();
-			
-			if (distanceToNextNearestHomeblock < minDistance || distanceToNextNearestHomeblock < TownySettings.getMinDistanceBetweenHomeblocks()) 
-				throw new TownyException(Translatable.of("msg_too_close2", Translatable.of("homeblock")));
-
-			if (TownySettings.getMaxDistanceBetweenHomeblocks() > 0 &&
-				TownyUniverse.getInstance().getTowns().size() > 0 &&
-				distanceToNextNearestHomeblock > TownySettings.getMaxDistanceBetweenHomeblocks())
-				throw new TownyException(Translatable.of("msg_too_far"));
-		}
 	}
 
 	private static String filterNameOrThrow(String name) throws TownyException {
@@ -3548,14 +3506,17 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 
 			// Select the area, can be one or many.
 			selection = AreaSelectionUtil.selectWorldCoordArea(town, new WorldCoord(world.getName(), key), split, true);
-			
-			if (selection.size() > 1) 
-				checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_CLAIM_TOWN_MULTIPLE.getNode());
 		}
 
 		// Filter out any TownBlocks which aren't Wilderness. 
 		selection = AreaSelectionUtil.filterOutTownOwnedBlocks(selection);
 
+		// Filter out any TownBlocks which have too much of the unwanted biomes, when enabled.
+		selection = AreaSelectionUtil.filterOutUnwantedBiomeWorldCoords(player, selection);
+
+		// Filter out any TownBlocks which have too much ocean biomes, when enabled.
+		selection = AreaSelectionUtil.filterOutOceanBiomeWorldCoords(player, selection);
+		
 		if (selection.isEmpty())
 			throw new TownyException(Translatable.of("msg_err_empty_area_selection"));
 
