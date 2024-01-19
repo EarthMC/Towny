@@ -129,6 +129,7 @@ town_trust_help_2: "町の信頼できる住民をリストします。"
 town_towntrust_help_0: "町を信頼できる町として追加します。"
 town_towntrust_help_1: "町をその町内の信頼済みとして削除します。"
 town_towntrust_help_2: "町の信頼できる町をリストします。"
+town_buy_help: "Purchases bonus townblocks to increase the claim limit of the town."
 mayor_help_3: '町でないエリアの領有を主張する'
 mayor_help_4: 'あなたの周囲Xブロック分（円又は四角）のエリアの領有を主張する'
 mayor_help_5: '自動で最大半径のエリアの領有を主張する'
@@ -423,6 +424,7 @@ msg_plot_fs_radius: 'Put up a radius of plots for sale.'
 ############################################################
 msg_buy: '&b%d %s を %s で購入しました'
 msg_buy_resident_plot: '&b%s が %s のプロットを %s で購入しました！'
+msg_buy_resident_plot_group: '&b%s bought %s''s plotgroup for %s!'
 msg_couldnt_pay_taxes: '&b%s は税金を払うことができなかったため、 %s からキックされました'
 msg_couldnt_pay_plot_taxes: '&s%s は税金を払うことができなかったため、プロットの所有権を失いました'
 msg_payed_town_tax: '%b税金を支払いました： '
@@ -620,6 +622,8 @@ msg_err_not_in_town_claim: '&c土地を請求するためには、町に所属�
 msg_err_must_belong_town: '&cあなたは町に所属している必要があります。'
 msg_err_dont_belong_town: '&cあなたは町に所属していません。'
 msg_err_dont_belong_nation: '&bあなたは国に属していません。'
+msg_err_already_belong_nation: '&bYou already belong to a nation.'
+msg_err_town_already_belong_nation: '&b%s already belongs to a nation: %s.'
 msg_err_not_same_nation: '&b%s はあなたの国に属していません。'
 msg_err_rect_auto: '&cautoは町や住民のみ利用できます。'
 msg_err_invalid_radius: '&cは無効な半径です。整数または ''auto'' を使用してください。'
@@ -795,7 +799,7 @@ msg_err_nation_sent_too_many_requests: '&b送信した招待が多すぎます�
 msg_err_nation_has_too_many_requests: '&b%sは招待が多すぎるため、しばらくしてから再度、送信してください。'
 player_received_invites: '&b%a/%mの招待を受け取りました。'
 town_revoke_invite: '&b%sは、あなたの招待を削除しました。'
-town_revoke_invite_successful: '&bあなたの町への招待を削除しました。'
+town_revoke_invite_successful: '&bYou have successfully revoked an invite to join your town sent to %s.'
 town_received_invites: '&b%a/%mの招待を受け取りました。'
 town_sent_invites: '&b%a/%mの招待を受け取りました。'
 nation_revoke_invite: '&b%sは、あなたの招待を削除しました。'
@@ -1876,6 +1880,14 @@ msg_perm_hud_nation: '国'
 msg_perm_hud_outsider: 'outsider'
 #Seen in /plot perm hud:
 msg_perm_hud_plot_name: 'プロット: '
+#Seen in /plot perm hud:
+msg_perm_hud_plotgroup_name: 'Plot Group: '
+#Seen in /plot perm hud:
+msg_perm_hud_plot_for_sale: 'For Sale: '
+#Seen in /plot perm hud:
+msg_perm_hud_no: 'No'
+#Seen in /plot perm hud:
+msg_perm_hud_yes: 'Yes'
 #Added in 0.153
 #Message shown confirming /ta town NAME settownlevel # command.
 msg_town_level_overridden_with: '%sは町のレベルを%sに設定しました。'
@@ -2079,3 +2091,8 @@ msg_err_cannot_nation_spawn_your_town_is_sanctioned: "Your town is sanctioned by
 msg_err_cannot_claim_the_following_worldcoords_because_of_unwanted_biome: "The following coordinate(s) cannot be claimed because they contain too much of an unwanted biome: %s."
 msg_err_cannot_claim_the_following_worldcoords_because_of_ocean_biome: "The following coordinate(s) cannot be claimed because they contain too much ocean biome: %s."
 msg_err_cannot_begin_town_in_this_biome: "You cannot start a town in this biome."
+msg_err_cannot_overclaim_this_town_because_they_arent_your_enemy: "You are not able to overclaim this town because your nation does not consider their nation an enemy."
+msg_err_unable_to_command_outside_of_town: 'You cannot use that command outside of your town.'
+msg_err_unable_to_use_bank_outside_bank_plot_no_homeblock: 'You cannot use that command outside of a bank plot.'
+msg_err_you_cannot_outlaw_your_mayor: "You cannot outlaw your town's mayor."
+msg_err_you_cannot_outlaw_because_of_rank: "You cannot outlaw %s because of a town rank they hold."

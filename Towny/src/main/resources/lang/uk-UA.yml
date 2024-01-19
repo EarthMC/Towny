@@ -129,6 +129,7 @@ town_trust_help_2: "Список довірених жителів(гравці�
 town_towntrust_help_0: "Додати місто як довірене в місті."
 town_towntrust_help_1: "Видалити місто як довірене в місті."
 town_towntrust_help_2: "Lists the Trusted towns of a town."
+town_buy_help: "Purchases bonus townblocks to increase the claim limit of the town."
 mayor_help_3: 'Територія не приєднана до міста'
 mayor_help_4: 'Привласнити місцевість в радіусі X навколо вас'
 mayor_help_5: 'Привласнити максимальний радіус'
@@ -423,6 +424,7 @@ msg_plot_fs_radius: 'Put up a radius of plots for sale.'
 ############################################################
 msg_buy: '&bПридбано %d %s за %s.'
 msg_buy_resident_plot: '&b%s купив ділянку землі %s за %s!'
+msg_buy_resident_plot_group: '&b%s bought %s''s plotgroup for %s!'
 msg_couldnt_pay_taxes: '&b%s не зміг сплатити податки, і був вигнаний з міста %s.'
 msg_couldnt_pay_plot_taxes: '&b%s не зміг сплатити податки й втратив право на власність ділянки.'
 msg_payed_town_tax: '&bЗаплатив податок місту '
@@ -620,6 +622,8 @@ msg_err_not_in_town_claim: '&cВи повинні бути в місті, щоб
 msg_err_must_belong_town: '&cВи маєте бути жителем міста.'
 msg_err_dont_belong_town: '&cВи не належите до міста.'
 msg_err_dont_belong_nation: '&bВи не належите до нації.'
+msg_err_already_belong_nation: '&bYou already belong to a nation.'
+msg_err_town_already_belong_nation: '&b%s already belongs to a nation: %s.'
 msg_err_not_same_nation: '&b%s не належить до нації.'
 msg_err_rect_auto: '&cТільки міста та городяни можуть використовувати авто режим.'
 msg_err_invalid_radius: '&cПомилковий радіус. Вкажіть ціле число або ''auto''.'
@@ -795,7 +799,7 @@ msg_err_nation_sent_too_many_requests: '&bНація надіслала зана
 msg_err_nation_has_too_many_requests: '&bНація %s має занадто багато запрошень, попросіть відхилити деякі з них, перед тим як спробувати знову.'
 player_received_invites: '&bВи отримали %a/%m повідомлень.'
 town_revoke_invite: '&bМісто %s відхилило ваше запрошення приєднатися до них.'
-town_revoke_invite_successful: '&bВи успішно відкликали запрошення приєднатися до вашого міста.'
+town_revoke_invite_successful: '&bYou have successfully revoked an invite to join your town sent to %s.'
 town_received_invites: '&bМісто отримало %a/%m запрошень.'
 town_sent_invites: '&bМісто відправило %a/%m запрошень.'
 nation_revoke_invite: '&bНація %s- відкликала ваше запрошення приєднатися до них.'
@@ -1876,6 +1880,14 @@ msg_perm_hud_nation: 'нація'
 msg_perm_hud_outsider: 'чужинець'
 #Seen in /plot perm hud:
 msg_perm_hud_plot_name: 'Ділянка: '
+#Seen in /plot perm hud:
+msg_perm_hud_plotgroup_name: 'Plot Group: '
+#Seen in /plot perm hud:
+msg_perm_hud_plot_for_sale: 'For Sale: '
+#Seen in /plot perm hud:
+msg_perm_hud_no: 'No'
+#Seen in /plot perm hud:
+msg_perm_hud_yes: 'Yes'
 #Added in 0.153
 #Message shown confirming /ta town NAME settownlevel # command.
 msg_town_level_overridden_with: 'Місто %s установило свій рівень %s.'
@@ -2079,3 +2091,8 @@ msg_err_cannot_nation_spawn_your_town_is_sanctioned: "Your town is sanctioned by
 msg_err_cannot_claim_the_following_worldcoords_because_of_unwanted_biome: "The following coordinate(s) cannot be claimed because they contain too much of an unwanted biome: %s."
 msg_err_cannot_claim_the_following_worldcoords_because_of_ocean_biome: "The following coordinate(s) cannot be claimed because they contain too much ocean biome: %s."
 msg_err_cannot_begin_town_in_this_biome: "You cannot start a town in this biome."
+msg_err_cannot_overclaim_this_town_because_they_arent_your_enemy: "You are not able to overclaim this town because your nation does not consider their nation an enemy."
+msg_err_unable_to_command_outside_of_town: 'You cannot use that command outside of your town.'
+msg_err_unable_to_use_bank_outside_bank_plot_no_homeblock: 'You cannot use that command outside of a bank plot.'
+msg_err_you_cannot_outlaw_your_mayor: "You cannot outlaw your town's mayor."
+msg_err_you_cannot_outlaw_because_of_rank: "You cannot outlaw %s because of a town rank they hold."

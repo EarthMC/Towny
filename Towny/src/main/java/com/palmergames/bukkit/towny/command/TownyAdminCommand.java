@@ -1198,7 +1198,19 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 			break;
 		case "kick":
 			checkPermOrThrow(sender, PermissionNodes.TOWNY_COMMAND_TOWNYADMIN_TOWN_KICK.getNode());
-			TownCommand.townKickResidents(sender, town.getMayor(), town, ResidentUtil.getValidatedResidentsOfTown(sender, town, StringMgmt.remArgs(split, 2)));
+			// Force-kick command for admins.
+			if (split.length < 3)
+				throw new TownyException(Translatable.of("msg_err_invalid_input", "/ta town TOWNNAME kick PLAYERNAME"));
+			resident = getResidentOrThrow(split[2]);
+			if (!town.hasResident(resident))
+				throw new TownyException(Translatable.of("msg_err_townadmintownrank_wrong_town"));
+			if (resident.isMayor())
+				throw new TownyException(Translatable.of("msg_you_cannot_kick_this_resident", resident.getName()));
+			resident.removeTown();
+			TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_kicked", "Console", resident.getName()));
+			TownyMessaging.sendMsg(sender, Translatable.of("msg_kicked", "You", resident.getName()));
+			if (resident.isOnline())
+				TownyMessaging.sendMsg(resident, Translatable.of("msg_kicked_by", "Console"));
 			break;
 		case "delete":
 			checkPermOrThrow(sender, PermissionNodes.TOWNY_COMMAND_TOWNYADMIN_TOWN_DELETE.getNode());
@@ -1393,7 +1405,7 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 				throw new TownyException(Translatable.of("msg_player_is_not_online", split[2]));
 			player = resident.getPlayer();
 		}
-		TownCommand.newTown(player, split[1], resident, true);
+		TownCommand.newTown(player, split[1], resident, true, true);
 	}
 
 	private void parseAdminTownSet(CommandSender sender, Town town, String[] split) throws TownyException {
@@ -2110,7 +2122,7 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 		TownBlock tb = TownyAPI.getInstance().getTownBlock(player);
 		if (tb != null) {
 			Town newTown = getTownOrThrow(split[1]);
-			tb.setResident(null);
+			tb.removeResident();
 			tb.setTown(newTown);
 			tb.setType(TownBlockType.RESIDENTIAL);
 			tb.setName("");

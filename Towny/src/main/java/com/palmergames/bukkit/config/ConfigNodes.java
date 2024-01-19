@@ -492,6 +492,11 @@ public enum ConfigNodes {
 	GTOWN_SETTINGS_REGEN_ENABLE(
 			"global_town_settings.health_regen.enable",
 			"true"),
+	GTOWN_SETTINGS_REGEN_PREVENT_SATURATION_LOSS(
+			"global_town_settings.saturation_regen.also_prevent_saturation_loss",
+			"true",
+			"",
+			"# When true players cannot become hungrier when in their own or an allied town."),
 
 	GTOWN_SETTINGS_PVP_COOLDOWN_TIMER(
 			"global_town_settings.pvp_cooldown_time",
@@ -985,6 +990,12 @@ public enum ConfigNodes {
 			"# The maximum townblocks available to a town is (numResidents * ratio).",
 			"# Setting this value to 0 will instead use the level based jump values determined in the town level config.",
 			"# Setting this to -1 will result in every town having unlimited claims."),
+	CLAIMING_DEF_BONUS_CLAIMS(
+			"claiming.new_town_bonus_claims",
+			"0",
+			"",
+			"# An amount of additional townblocks that a town will receive when it is first created, in addition to any amount given via the town_block_ratio or town_levels.",
+			"# As an example: This can be used to add 10 townblocks to a town when it is made so the borders can be grown a bit more before the mayor has to seek out residents."),
 	CLAIMING_TOWN_BLOCK_LIMIT(
 			"claiming.town_block_limit",
 			"0",
@@ -1000,6 +1011,11 @@ public enum ConfigNodes {
 			"# at the cost of more work setting up. Also, extremely small values will render the caching done useless.",
 			"# Each cell is (town_block_size * town_block_size * height-of-the-world) in size, with height-of-the-world",
 			"# being from the bottom to the top of the build-able world."),
+	CLAIMING_SHOW_CLAIM_PARTICLES(
+			"claiming.show_claiming_particles",
+			"true",
+			"",
+			"# When false players will not see the particle flood effect when they claim townblocks."),
 	CLAIMING_MIN_ADJACENT_BLOCKS(
 			"claiming.min_adjacent_blocks",
 			"-1",
@@ -1553,7 +1569,7 @@ public enum ConfigNodes {
 			"",
 			"# Spams the player named in dev_name with all messages related to towny."),
 	PLUGIN_DEV_MODE_ENABLE("plugin.dev_mode.enable", "false"),
-	PLUGIN_DEV_MODE_DEV_NAME("plugin.dev_mode.dev_name", "ElgarL"),
+	PLUGIN_DEV_MODE_DEV_NAME("plugin.dev_mode.dev_name", "LlmDl"),
 	PLUGIN_RESET_LOG_ON_BOOT(
 			"plugin.reset_log_on_boot",
 			"true",
@@ -3025,6 +3041,12 @@ public enum ConfigNodes {
 			"",
 			"# If true players will only be able to use /t deposit, /t withdraw, /n deposit & /n withdraw while inside bank plots belonging to the town or nation capital respectively.",
 			"# Home plots will also allow deposit and withdraw commands."),
+	BANK_BANK_PLOTS_STOP_HOME_BLOCK_BEING_USED(
+			"bank.do_homeblocks_not_work_when_a_town_has_bank_plots",
+			"false",
+			"",
+			"# If true, towns which have one or more bank plots will no longer be able to use their homeblock for withdraw/depositing.",
+			"# Requires the above is_banking_limited_to_bank_plots to be true as well."),
 	
 	TOWN_RUINING_HEADER("town_ruining", "", "", "",
 			"############################################################",

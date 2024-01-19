@@ -129,6 +129,7 @@ town_trust_help_2: "Lista os residentes confiáveis de uma cidade."
 town_towntrust_help_0: "Adiciona uma cidade como confiável na cidade."
 town_towntrust_help_1: "Remove uma cidade como confiável na cidade."
 town_towntrust_help_2: "Lista as cidades confiáveis de uma cidade."
+town_buy_help: "Purchases bonus townblocks to increase the claim limit of the town."
 mayor_help_3: 'Reivindicar área separada da cidade'
 mayor_help_4: 'Reivindicar à sua volta num raio de X'
 mayor_help_5: 'Reivindicar no raio máximo'
@@ -423,6 +424,7 @@ msg_plot_fs_radius: 'Put up a radius of plots for sale.'
 ############################################################
 msg_buy: '&bComprou %d %s por %s.'
 msg_buy_resident_plot: '&b%s comprou o terreno de %s por %s!'
+msg_buy_resident_plot_group: '&b%s bought %s''s plotgroup for %s!'
 msg_couldnt_pay_taxes: '&b%s não conseguiu pagar os impostos e foi expulso de %s.'
 msg_couldnt_pay_plot_taxes: '&b%s não conseguiu pagar os impostos e perdeu a posse de um terreno.'
 msg_payed_town_tax: '&bVocê pagou o imposto da cidade de '
@@ -620,6 +622,8 @@ msg_err_not_in_town_claim: '&cVocê deve pertencer a uma cidade para reivindicar
 msg_err_must_belong_town: '&cVocê deve pertencer a uma cidade.'
 msg_err_dont_belong_town: '&cVocê não pertence a nenhuma cidade.'
 msg_err_dont_belong_nation: '&bVocê não pertence a nenhuma nação.'
+msg_err_already_belong_nation: '&bYou already belong to a nation.'
+msg_err_town_already_belong_nation: '&b%s already belongs to a nation: %s.'
 msg_err_not_same_nation: '&b%s não pertence à sua nação.'
 msg_err_rect_auto: '&cApenas cidades e residentes podem usar auto.'
 msg_err_invalid_radius: '&cRaio. Use um número inteiro ou ''auto''.'
@@ -795,7 +799,7 @@ msg_err_nation_sent_too_many_requests: '&A nação já enviou demasiados pedidos
 msg_err_nation_has_too_many_requests: '&bA nação %s tem demasiados pedidos de aliança, pergunte-lhes para recusar alguns antes de convidar outra vez.'
 player_received_invites: '&bVocê recebeu %a/%m convites.'
 town_revoke_invite: '&bA cidade %s cancelou o convite para você entrar.'
-town_revoke_invite_successful: '&bVocê cancelou um convite para entrarem na sua cidade com sucesso.'
+town_revoke_invite_successful: '&bYou have successfully revoked an invite to join your town sent to %s.'
 town_received_invites: '&bA cidade recebeu %a/%m convites.'
 town_sent_invites: '&bA cidade recebeu %a/%m convites.'
 nation_revoke_invite: '&bA nação %s cancelou o convite para você entrar.'
@@ -1876,6 +1880,14 @@ msg_perm_hud_nation: 'nation'
 msg_perm_hud_outsider: 'outsider'
 #Seen in /plot perm hud:
 msg_perm_hud_plot_name: 'Plot: '
+#Seen in /plot perm hud:
+msg_perm_hud_plotgroup_name: 'Plot Group: '
+#Seen in /plot perm hud:
+msg_perm_hud_plot_for_sale: 'For Sale: '
+#Seen in /plot perm hud:
+msg_perm_hud_no: 'No'
+#Seen in /plot perm hud:
+msg_perm_hud_yes: 'Yes'
 #Added in 0.153
 #Message shown confirming /ta town NAME settownlevel # command.
 msg_town_level_overridden_with: 'The town %s has had their townlevel set to %s.'
@@ -2079,3 +2091,8 @@ msg_err_cannot_nation_spawn_your_town_is_sanctioned: "Your town is sanctioned by
 msg_err_cannot_claim_the_following_worldcoords_because_of_unwanted_biome: "The following coordinate(s) cannot be claimed because they contain too much of an unwanted biome: %s."
 msg_err_cannot_claim_the_following_worldcoords_because_of_ocean_biome: "The following coordinate(s) cannot be claimed because they contain too much ocean biome: %s."
 msg_err_cannot_begin_town_in_this_biome: "You cannot start a town in this biome."
+msg_err_cannot_overclaim_this_town_because_they_arent_your_enemy: "You are not able to overclaim this town because your nation does not consider their nation an enemy."
+msg_err_unable_to_command_outside_of_town: 'You cannot use that command outside of your town.'
+msg_err_unable_to_use_bank_outside_bank_plot_no_homeblock: 'You cannot use that command outside of a bank plot.'
+msg_err_you_cannot_outlaw_your_mayor: "You cannot outlaw your town's mayor."
+msg_err_you_cannot_outlaw_because_of_rank: "You cannot outlaw %s because of a town rank they hold."

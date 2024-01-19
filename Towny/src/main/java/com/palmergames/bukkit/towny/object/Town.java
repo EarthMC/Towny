@@ -17,6 +17,7 @@ import com.palmergames.bukkit.towny.event.town.TownAddAlliedTownEvent;
 import com.palmergames.bukkit.towny.event.town.TownAddEnemiedTownEvent;
 import com.palmergames.bukkit.towny.event.town.TownCalculateTownLevelNumberEvent;
 import com.palmergames.bukkit.towny.event.town.TownConqueredEvent;
+import com.palmergames.bukkit.towny.event.town.TownIsTownOverClaimedEvent;
 import com.palmergames.bukkit.towny.event.town.TownMapColourLocalCalculationEvent;
 import com.palmergames.bukkit.towny.event.town.TownMapColourNationalCalculationEvent;
 import com.palmergames.bukkit.towny.event.town.TownMayorChangedEvent;
@@ -36,6 +37,7 @@ import com.palmergames.bukkit.towny.permissions.TownyPerms;
 import com.palmergames.bukkit.towny.utils.CombatUtil;
 import com.palmergames.bukkit.towny.utils.MoneyUtil;
 import com.palmergames.bukkit.towny.utils.ProximityUtil;
+import com.palmergames.bukkit.towny.utils.TownUtil;
 import com.palmergames.bukkit.towny.utils.TownyComponents;
 import com.palmergames.bukkit.util.BukkitTools;
 import net.kyori.adventure.audience.Audience;
@@ -45,6 +47,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -388,7 +391,14 @@ public class Town extends Government implements TownBlockOwner {
 		return hasResident(resident) && resident.hasTownRank(rank);
 	}
 
-	void addResident(Resident resident) {
+	/**
+	 * DO NOT USE THIS. This is visiable for testing only!
+	 * Use {@link Resident#setTown(Town)} instead.
+	 *
+	 * @param resident Resident that gets added to the town.
+	 */
+	@VisibleForTesting
+	public void addResident(Resident resident) {
 		residents.add(resident);
 	}
 
@@ -398,8 +408,8 @@ public class Town extends Government implements TownBlockOwner {
 			throw new AlreadyRegisteredException(Translation.of("msg_err_already_in_town", resident.getName(), getFormattedName()));
 		
 		final Town residentTown = resident.getTownOrNull();
-		if (residentTown != null && !this.equals(residentTown)) {
-			throw new AlreadyRegisteredException(Translation.of("msg_err_already_in_town", resident.getName(), residentTown.getFormattedName()));			}
+		if (residentTown != null && !this.equals(residentTown))
+			throw new AlreadyRegisteredException(Translation.of("msg_err_already_in_town", resident.getName(), residentTown.getFormattedName()));
 	}
 
 	public boolean isMayor(Resident resident) {
@@ -1241,7 +1251,11 @@ public class Town extends Government implements TownBlockOwner {
 	}
 	
 	public boolean isOverClaimed() {
-		return !hasUnlimitedClaims() && getTownBlocks().size() > getMaxTownBlocks();
+		if (hasUnlimitedClaims() || getTownBlocks().size() <= getMaxTownBlocks())
+			return false;
+
+		TownIsTownOverClaimedEvent event = new TownIsTownOverClaimedEvent(this);
+		return !BukkitTools.isEventCancelled(event);
 	}
 	
 	/**
@@ -1903,5 +1917,30 @@ public class Town extends Government implements TownBlockOwner {
 
 	public void playerBroadCastMessageToTown(Player player, String message) {
 		TownyMessaging.sendPrefixedTownMessage(this, Translatable.of("town_say_format", player.getName(), TownyComponents.stripClickTags(message)));
+	}
+
+	public void checkTownHasEnoughResidentsForNationRequirements() {
+		TownUtil.checkNationResidentsRequirementsOfTown(this);
+	}
+
+	public boolean hasEnoughResidentsToJoinANation() {
+		return TownUtil.townHasEnoughResidentsToJoinANation(this);
+	}
+
+	public boolean hasEnoughResidentsToBeANationCapital() {
+		return TownUtil.townHasEnoughResidentsToBeANationCapital(this);
+	}
+
+	/**
+	 * Is this town allowed to have the given number of residents?
+	 * 
+	 * @param residentCount Number of residents to test with.
+	 * @param isCapital     When false, a capital city will be tested as though it
+	 *                      were not a non-Capital city.
+	 * @return true if the town can support the number of residents based on the
+	 *         rules configured on the server.
+	 */
+	public boolean isAllowedThisAmountOfResidents(int residentCount, boolean isCapital) {
+		return TownUtil.townCanHaveThisAmountOfResidents(this, residentCount, isCapital);
 	}
 }

@@ -22,6 +22,7 @@ import com.palmergames.bukkit.towny.event.damage.TownyPlayerDamagePlayerEvent;
 import com.palmergames.bukkit.towny.event.nation.NationPreTownLeaveEvent;
 import com.palmergames.bukkit.towny.event.town.TownPreUnclaimCmdEvent;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
+import com.palmergames.bukkit.towny.object.CellSurface;
 import com.palmergames.bukkit.towny.object.PlayerCache;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.SpawnType;
@@ -71,39 +72,57 @@ public class TownyCustomListener implements Listener {
 		if (resident == null)
 			return;
 
-		try {
-			if (resident.hasMode("townclaim"))
-				TownCommand.parseTownClaimCommand(player, new String[] {});
-			if (resident.hasMode("townunclaim"))
-				TownCommand.parseTownUnclaimCommand(player, new String[] {});
-			if (resident.hasMode("plotgroup") && resident.hasPlotGroupName()) 
-				Towny.getPlugin().getScheduler().runLater(player, () -> Bukkit.dispatchCommand(player, "plot group add " + resident.getPlotGroupName()), 1l);
-		} catch (TownyException e) {
-			TownyMessaging.sendErrorMsg(player, e.getMessage(player));
-		}
-		if (resident.hasMode("map"))
-			TownyCommand.showMap(player);
-		if (resident.hasMode("plotborder") || resident.hasMode("constantplotborder"))
-			BorderUtil.getPlotBorder(to).runBorderedOnSurface(1, 2, DrawSmokeTaskFactory.showToPlayer(player, to));
+		// Run the following with a one tick delay, so that everything has a chance to take in the player's position.
+		plugin.getScheduler().runLater(() -> {
+			try {
+				if (resident.hasMode("townclaim"))
+					TownCommand.parseTownClaimCommand(player, new String[] {});
+				if (resident.hasMode("townunclaim"))
+					TownCommand.parseTownUnclaimCommand(player, new String[] {});
+				if (resident.hasMode("plotgroup") && resident.hasPlotGroupName()) 
+					Towny.getPlugin().getScheduler().runLater(player, () -> Bukkit.dispatchCommand(player, "plot group add " + resident.getPlotGroupName()), 1L);
+			} catch (TownyException e) {
+				TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+			}
+			if (resident.hasMode("map"))
+				TownyCommand.showMap(player);
 
+			if (resident.hasMode("plotborder") || resident.hasMode("constantplotborder"))
+				BorderUtil.getPlotBorder(to).runBorderedOnSurface(1, 2, DrawSmokeTaskFactory.showToPlayer(player, to));
+
+		}, 1L);
+
+		// Run the following with a two tick delay, so that newly claimed land will appear correctly.
 		// Check if player has entered a new town/wilderness
 		if (event.isShowingPlotNotifications())
-			ChunkNotificationUtil.showChunkNotification(player, resident, to, from);
+			plugin.getScheduler().runLater(() -> ChunkNotificationUtil.showChunkNotification(player, resident, to, from), 2L);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerCreateTown(NewTownEvent event) {
-		Town town = event.getTown();
-		double upkeep = TownySettings.getTownUpkeepCost(town);
-		if (TownyEconomyHandler.isActive() && TownySettings.isTaxingDaily() && upkeep > 0) {
-			String cost = TownyEconomyHandler.getFormattedBalance(upkeep);
-			String time = TimeMgmt.formatCountdownTime(TimeMgmt.townyTime(true));
-			TownyMessaging.sendTownMessagePrefixed(town, Translatable.of("msg_new_town_advice", cost, time));
-		}
+		final Town town = event.getTown();
+		Resident mayor = town.getMayor();
+		if (mayor.isOnline() && town.hasHomeBlock() && TownySettings.isShowingClaimParticleEffect())
+			CellSurface.getCellSurface(town.getHomeBlockOrNull().getWorldCoord()).runClaimingParticleOverSurfaceAtPlayer(mayor.getPlayer());
+
+		// Run the bank warning with a 10 second delay.
+		plugin.getScheduler().runLater(() -> {
+			double upkeep = TownySettings.getTownUpkeepCost(town);
+			if (TownyEconomyHandler.isActive() && TownySettings.isTaxingDaily() && upkeep > 0) {
+				String cost = TownyEconomyHandler.getFormattedBalance(upkeep);
+				String time = TimeMgmt.formatCountdownTime(TimeMgmt.townyTime(true));
+				TownyMessaging.sendTownMessagePrefixed(town, Translatable.of("msg_new_town_advice", cost, time));
+			}
+		}, 200L);
+
+		// Award new town with any potential bonus blocks.
+		int bonus = TownySettings.getNewTownBonusBlocks();
+		if (bonus > 0)
+			town.setBonusBlocks(town.getBonusBlocks() + bonus);
+
 		//TODO: at some point it might be nice to have a written_book given to mayors 
 		// which could contain the above advice about depositing money, or containing
 		// links to the commands page on the wiki.
-		
 	}
 	
 	/**
@@ -194,18 +213,22 @@ public class TownyCustomListener implements Listener {
 
 	/**
 	 * Used to warn towns when they're approaching their claim limit, when the
-	 * takeoverclaim feature is enabled
+	 * takeoverclaim feature is enabled, as well as claiming particles.
 	 * 
 	 * @param event TownClaimEvent.
 	 */
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onTownClaim(TownClaimEvent event) {
+		if (TownySettings.isShowingClaimParticleEffect())
+			Towny.getPlugin().getScheduler().runAsync(() ->
+				CellSurface.getCellSurface(event.getTownBlock().getWorldCoord()).runClaimingParticleOverSurfaceAtPlayer(event.getResident().getPlayer()));
+
 		if (!TownySettings.isOverClaimingAllowingStolenLand())
 			return;
 		if (event.getTown().availableTownBlocks() <= TownySettings.getTownBlockRatio())
 			TownyMessaging.sendMsg(event.getResident(), Translatable.literal(Colors.Red).append(Translatable.of("msg_warning_you_are_almost_out_of_townblocks")));
 	}
-
+	
 	/**
 	 * Used to warn towns when they've lost a resident, so they know they're at risk
 	 * of having claims stolen in the takeoverclaim feature.
@@ -216,7 +239,7 @@ public class TownyCustomListener implements Listener {
 	public void onTownLosesResident(TownRemoveResidentEvent event) {
 		if (!TownySettings.isOverClaimingAllowingStolenLand())
 			return;
-		if (event.getTown().getTownBlocks().size() > event.getTown().getMaxTownBlocks())
+		if (event.getTown().isOverClaimed())
 			TownyMessaging.sendPrefixedTownMessage(event.getTown(), Translatable.literal(Colors.Red).append(Translatable.of("msg_warning_your_town_is_overclaimed")));
 	}
 

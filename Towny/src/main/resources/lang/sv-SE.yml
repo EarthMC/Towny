@@ -129,6 +129,7 @@ town_trust_help_2: "Lists the Trusted residents of a town."
 town_towntrust_help_0: "Adds a town as Trusted in the town."
 town_towntrust_help_1: "Removes a town as Trusted in the town."
 town_towntrust_help_2: "Lists the Trusted towns of a town."
+town_buy_help: "Purchases bonus townblocks to increase the claim limit of the town."
 mayor_help_3: 'Marken är inte sammankopplad med din stad.'
 mayor_help_4: 'Köp marken omkring dig med en radius på X'
 mayor_help_5: 'Köp all mark du kan åt alla håll.'
@@ -423,6 +424,7 @@ msg_plot_fs_radius: 'Put up a radius of plots for sale.'
 ############################################################
 msg_buy: '&bKöpte %d %s till priset %s.'
 msg_buy_resident_plot: '&b%s köpte %s mark till priset %s!'
+msg_buy_resident_plot_group: '&b%s bought %s''s plotgroup for %s!'
 msg_couldnt_pay_taxes: '&b%s kunde inte betala skatten och blev utslängd från %s.'
 msg_couldnt_pay_plot_taxes: '&b%s kunde inte betala skatten och förlorade sin mark.'
 msg_payed_town_tax: '&bBetalade statsskatten '
@@ -620,6 +622,8 @@ msg_err_not_in_town_claim: '&cDu måste tillhöra en stad för att kunna köpa m
 msg_err_must_belong_town: '&cDu måste tillhöra en stad.'
 msg_err_dont_belong_town: '&cDu tillhör inte en stad.'
 msg_err_dont_belong_nation: '&bDu tillhör inte en nation.'
+msg_err_already_belong_nation: '&bYou already belong to a nation.'
+msg_err_town_already_belong_nation: '&b%s already belongs to a nation: %s.'
 msg_err_not_same_nation: '&b%s tillhör inte din nation.'
 msg_err_rect_auto: '&cEndast städer och invånare kan använda auto.'
 msg_err_invalid_radius: '&cOgiltig radie. Använd ett heltal eller ''auto''.'
@@ -795,7 +799,7 @@ msg_err_nation_sent_too_many_requests: '&bNationen har skickat för många förf
 msg_err_nation_has_too_many_requests: '&bNationen %s har för många förfrågningar, be dem att avböja några, innan du begär igen.'
 player_received_invites: '&bDu har fått %a/%m inbjudningar.'
 town_revoke_invite: '&bStaden %s, återkallade din inbjudan att gå med i den.'
-town_revoke_invite_successful: '&bDu har framgångsrikt återkallat en inbjudan att gå med i din stad.'
+town_revoke_invite_successful: '&bYou have successfully revoked an invite to join your town sent to %s.'
 town_received_invites: '&bStaden har fått %a/%m inbjudningar.'
 town_sent_invites: '&bStaden har skickat %a/%m inbjudningar.'
 nation_revoke_invite: '&bNationen %s, återkallade din inbjudan om att ansluta till dem.'
@@ -1876,6 +1880,14 @@ msg_perm_hud_nation: 'nation'
 msg_perm_hud_outsider: 'outsider'
 #Seen in /plot perm hud:
 msg_perm_hud_plot_name: 'Plot: '
+#Seen in /plot perm hud:
+msg_perm_hud_plotgroup_name: 'Plot Group: '
+#Seen in /plot perm hud:
+msg_perm_hud_plot_for_sale: 'For Sale: '
+#Seen in /plot perm hud:
+msg_perm_hud_no: 'No'
+#Seen in /plot perm hud:
+msg_perm_hud_yes: 'Yes'
 #Added in 0.153
 #Message shown confirming /ta town NAME settownlevel # command.
 msg_town_level_overridden_with: 'The town %s has had their townlevel set to %s.'
@@ -2079,3 +2091,8 @@ msg_err_cannot_nation_spawn_your_town_is_sanctioned: "Your town is sanctioned by
 msg_err_cannot_claim_the_following_worldcoords_because_of_unwanted_biome: "The following coordinate(s) cannot be claimed because they contain too much of an unwanted biome: %s."
 msg_err_cannot_claim_the_following_worldcoords_because_of_ocean_biome: "The following coordinate(s) cannot be claimed because they contain too much ocean biome: %s."
 msg_err_cannot_begin_town_in_this_biome: "You cannot start a town in this biome."
+msg_err_cannot_overclaim_this_town_because_they_arent_your_enemy: "You are not able to overclaim this town because your nation does not consider their nation an enemy."
+msg_err_unable_to_command_outside_of_town: 'You cannot use that command outside of your town.'
+msg_err_unable_to_use_bank_outside_bank_plot_no_homeblock: 'You cannot use that command outside of a bank plot.'
+msg_err_you_cannot_outlaw_your_mayor: "You cannot outlaw your town's mayor."
+msg_err_you_cannot_outlaw_because_of_rank: "You cannot outlaw %s because of a town rank they hold."

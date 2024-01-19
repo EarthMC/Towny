@@ -129,6 +129,7 @@ town_trust_help_2: "Lists the Trusted residents of a town."
 town_towntrust_help_0: "Adds a town as Trusted in the town."
 town_towntrust_help_1: "Removes a town as Trusted in the town."
 town_towntrust_help_2: "Lists the Trusted towns of a town."
+town_buy_help: "Purchases bonus townblocks to increase the claim limit of the town."
 mayor_help_3: 'Wilayah yang ingin di ambil tidak berdekatan dengan kota'
 mayor_help_4: 'Ambil wilayah di sekitar mu sampai radius X'
 mayor_help_5: 'Ambil wilayah sampai radius maksimal'
@@ -423,6 +424,7 @@ msg_plot_fs_radius: 'Put up a radius of plots for sale.'
 ############################################################
 msg_buy: '&bMembeli %d %s seharga %s.'
 msg_buy_resident_plot: '&b%s membeli %s lahan seharga %s!'
+msg_buy_resident_plot_group: '&b%s bought %s''s plotgroup for %s!'
 msg_couldnt_pay_taxes: '&b%s tidak mampu membayar pajak, dan dikeluarkan dari %s.'
 msg_couldnt_pay_plot_taxes: '&b%s tidak mampu membayar pajak, dan kepemilikan lahan di hapus.'
 msg_payed_town_tax: '&bMembayar pajak kota '
@@ -620,6 +622,8 @@ msg_err_not_in_town_claim: '&cKamu harus memiliki kota terlebih dahulu sebelum m
 msg_err_must_belong_town: '&cKamu harus memiliki kota terlebih dahulu.'
 msg_err_dont_belong_town: '&cKamu tidak memiliki kota.'
 msg_err_dont_belong_nation: '&bKamu tidak termasuk di negara manapun.'
+msg_err_already_belong_nation: '&bYou already belong to a nation.'
+msg_err_town_already_belong_nation: '&b%s already belongs to a nation: %s.'
 msg_err_not_same_nation: '&b%s Ini bukan milik negara mu.'
 msg_err_rect_auto: '&cHanya kota dan penduduk yang dapat menggunakan auto.'
 msg_err_invalid_radius: '&cRadius tidak benar. Gunakan bilangan bulat atau ''auto''.'
@@ -795,7 +799,7 @@ msg_err_nation_sent_too_many_requests: '&bNegara terlalu banyak mengirim permint
 msg_err_nation_has_too_many_requests: '&bNegara %s telalu banyak memiliki permintaan, tanyakan mereka untuk menolak beberapa, sebelum mencoba kembali.'
 player_received_invites: '&bKamu telah menerima %a/%m undangan.'
 town_revoke_invite: '&bKota %s, telah mencaut undangan yang di kirim ke kamu.'
-town_revoke_invite_successful: '&bBerhasil mencabut undangan untuk bergabung ke kota.'
+town_revoke_invite_successful: '&bYou have successfully revoked an invite to join your town sent to %s.'
 town_received_invites: '&bKota mendapatkan %a/%m undangan.'
 town_sent_invites: '&bKota telah mengirimkan %a/%m undangan.'
 nation_revoke_invite: '&bNegara %s, mencabut undangan yang mereka kirim ke kota mu.'
@@ -1876,6 +1880,14 @@ msg_perm_hud_nation: 'negara'
 msg_perm_hud_outsider: 'orang luar'
 #Seen in /plot perm hud:
 msg_perm_hud_plot_name: 'Lahan: '
+#Seen in /plot perm hud:
+msg_perm_hud_plotgroup_name: 'Plot Group: '
+#Seen in /plot perm hud:
+msg_perm_hud_plot_for_sale: 'For Sale: '
+#Seen in /plot perm hud:
+msg_perm_hud_no: 'No'
+#Seen in /plot perm hud:
+msg_perm_hud_yes: 'Yes'
 #Added in 0.153
 #Message shown confirming /ta town NAME settownlevel # command.
 msg_town_level_overridden_with: 'Kota %s telah mengatur townlevel mereka ke %s.'
@@ -2079,3 +2091,8 @@ msg_err_cannot_nation_spawn_your_town_is_sanctioned: "Your town is sanctioned by
 msg_err_cannot_claim_the_following_worldcoords_because_of_unwanted_biome: "The following coordinate(s) cannot be claimed because they contain too much of an unwanted biome: %s."
 msg_err_cannot_claim_the_following_worldcoords_because_of_ocean_biome: "The following coordinate(s) cannot be claimed because they contain too much ocean biome: %s."
 msg_err_cannot_begin_town_in_this_biome: "You cannot start a town in this biome."
+msg_err_cannot_overclaim_this_town_because_they_arent_your_enemy: "You are not able to overclaim this town because your nation does not consider their nation an enemy."
+msg_err_unable_to_command_outside_of_town: 'You cannot use that command outside of your town.'
+msg_err_unable_to_use_bank_outside_bank_plot_no_homeblock: 'You cannot use that command outside of a bank plot.'
+msg_err_you_cannot_outlaw_your_mayor: "You cannot outlaw your town's mayor."
+msg_err_you_cannot_outlaw_because_of_rank: "You cannot outlaw %s because of a town rank they hold."

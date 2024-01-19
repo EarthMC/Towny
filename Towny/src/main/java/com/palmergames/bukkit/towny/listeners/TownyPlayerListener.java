@@ -775,7 +775,7 @@ public class TownyPlayerListener implements Listener {
 		
 		Player player = event.getPlayer();
 		Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
-		boolean isAdmin = resident != null && (resident.isAdmin() || resident.hasPermissionNode(PermissionNodes.TOWNY_ADMIN_OUTLAW_TELEPORT_BYPASS.getNode()));
+		boolean isAdmin = !Towny.getPlugin().hasPlayerMode(player, "adminbypass") && resident != null && (resident.isAdmin() || resident.hasPermissionNode(PermissionNodes.TOWNY_ADMIN_OUTLAW_TELEPORT_BYPASS.getNode()));
 		// Cancel teleport if Jailed by Towny and not an admin.
 		if (resident != null && resident.isJailed() && !isAdmin) {
 			if ((event.getCause() == TeleportCause.COMMAND)) {
@@ -878,7 +878,7 @@ public class TownyPlayerListener implements Listener {
 			// Non-player catches are tested for destroy permissions.
 			} else {
 				//Make decision on whether this is allowed using the PlayerCache and then a cancellable event.
-				test = TownyActionEventExecutor.canDestroy(player, caught.getLocation(), Material.GRASS);
+				test = TownyActionEventExecutor.canDestroy(player, caught.getLocation(), Material.DIRT);
 			}
 			if (!test) {
 				event.setCancelled(true);

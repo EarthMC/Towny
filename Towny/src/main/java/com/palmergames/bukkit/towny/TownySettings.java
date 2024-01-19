@@ -1338,9 +1338,17 @@ public class TownySettings {
 		return getInt(ConfigNodes.CLAIMING_TOWN_BLOCK_RATIO);
 	}
 
+	public static int getNewTownBonusBlocks() {
+		return getInt(ConfigNodes.CLAIMING_DEF_BONUS_CLAIMS);
+	}
+
 	public static int getTownBlockSize() {
 
 		return getInt(ConfigNodes.CLAIMING_TOWN_BLOCK_SIZE);
+	}
+
+	public static boolean isShowingClaimParticleEffect() {
+		return getBoolean(ConfigNodes.CLAIMING_SHOW_CLAIM_PARTICLES);
 	}
 
 	public static boolean isFriendlyFireEnabled() {
@@ -1527,6 +1535,10 @@ public class TownySettings {
 	public static boolean hasHealthRegen() {
 
 		return getBoolean(ConfigNodes.GTOWN_SETTINGS_REGEN_ENABLE);
+	}
+
+	public static boolean preventSaturationLoss() {
+		return getBoolean(ConfigNodes.GTOWN_SETTINGS_REGEN_PREVENT_SATURATION_LOSS);
 	}
 
 	public static boolean getTownDefaultPublic() {
@@ -2502,7 +2514,9 @@ public class TownySettings {
 		if (town.isCapital())
 			return getMaxResidentsPerTownCapitalOverride();
 		else 
-			return getMaxResidentsPerTown();
+			return !town.hasNation() && getMaxNumResidentsWithoutNation() > 0
+					? getMaxNumResidentsWithoutNation()
+					: getMaxResidentsPerTown();
 	}
 
 	public static boolean isTownyUpdating(String currentVersion) {
@@ -3053,6 +3067,10 @@ public class TownySettings {
 		return getBoolean(ConfigNodes.BANK_IS_LIMTED_TO_BANK_PLOTS);
 	}
 
+	public static boolean doHomeblocksNoLongerWorkWhenATownHasBankPlots() {
+		return getBoolean(ConfigNodes.BANK_BANK_PLOTS_STOP_HOME_BLOCK_BEING_USED);
+	}
+
 	public static void SetNationBankAllowWithdrawls(boolean newSetting) {
 
 		setProperty(ConfigNodes.ECO_BANK_NATION_ALLOW_WITHDRAWALS.getRoot(), newSetting);
@@ -3365,6 +3383,10 @@ public class TownySettings {
 		
 		if (fraction == 1.00)
 			return "100%";
+		if (fraction > 0.98)
+			return "99%";
+		if (fraction > 0.95)
+			return "95%+";
 		if (fraction > 0.89)
 			return "90%+";
 		if (fraction > 0.79)

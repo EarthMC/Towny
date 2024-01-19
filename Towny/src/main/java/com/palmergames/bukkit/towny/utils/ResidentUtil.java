@@ -70,7 +70,7 @@ public class ResidentUtil {
 	 * @param names - Names to be converted.
 	 * @return - List of residents to be used later.
 	 */
-	public static List<Resident> getValidatedResidents(CommandSender sender, String[] names) {
+	public static List<Resident> getValidatedResidents(CommandSender sender, List<String> names) {
 		List<Resident> residents = new ArrayList<>();
 		for (String name : names) {
 			List<Player> matches = BukkitTools.matchPlayer(name);
@@ -290,7 +290,7 @@ public class ResidentUtil {
 		if (BukkitTools.isEventCancelled(outlawEvent))
 			return;
 		
-		boolean hasBypassNode = outlaw.hasPermissionNode(PermissionNodes.TOWNY_ADMIN_OUTLAW_TELEPORT_BYPASS.getNode());
+		boolean hasBypassNode = outlaw.hasPermissionNode(PermissionNodes.TOWNY_ADMIN_OUTLAW_TELEPORT_BYPASS.getNode()) && !outlaw.hasMode("adminbypass");
 		
 		// Admins are omitted so towns won't be informed an admin might be spying on them.
 		if (TownySettings.doTownsGetWarnedOnOutlaw() && !hasBypassNode && !CooldownTimerTask.hasCooldown(outlaw.getName(), CooldownType.OUTLAW_WARNING)) {

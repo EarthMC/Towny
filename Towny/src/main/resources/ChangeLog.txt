@@ -9369,3 +9369,104 @@ v0.92.0.11:
   - Make plot groups extend townyobject, courtesy of Warrior with PR #7141.
     - Closes #6092.
   - Bump org.apache.logging.log4j:log4j-core from 2.22.0 to 2.22.1.
+  - Add option to prevent players depositing/withdrawing in their homeblocks when they have a bank plot available (all while deposit/withdraw is restricted to bank plots.)
+    - Closes #7162.
+  - New Config Option: bank.do_homeblocks_not_work_when_a_town_has_bank_plots
+    - Default: false
+    - If true, towns which have one or more bank plots will no longer be able to use their homeblock for withdraw/depositing.
+    - Requires the above is_banking_limited_to_bank_plots to be true as well.
+  - Fix plots not losing their trusted residents when the owner of the plot changes.
+    - Closes #7161.
+0.100.0.19:
+  - Make /ta town new [townname] bypass the proximity/claiming rules.
+    - Closes #7163.
+  - Fix outsiders being charged money for plotgroups they cannot actually /plot group claim, (not embassy plots.)
+  - Fix non-standard minecarts being unprotected.
+  - Hide /ta ? from the /towny ? screen when players are not admins.
+  - Add /t create and /n create tab completions.
+  - Render border particles under leaves.
+  - Fix PlayerChangePlotEvent reactions running too early.
+    - /res toggle townclaim mode and the ChunkNotifications that follow.
+  - Add an isOverClaim property to TownClaimEvent and TownUnclaimEvent, courtesy of Fruitloopins with PR #7165.
+0.100.0.20:
+  - Refactor PermHud class.
+  - Fix jail bail amounts not being applied correctly.
+  - Fix a couple places where the adminbypass mode would not stop admins being treated special for teleports.
+  - API: add TownIsTownOverClaimedEvent.
+    - Thrown when Towny asks if a Town is overclaimed, and it is.
+    - Allows other plugins to cancel the event, in which case Towny will tell itself that the town is not overclaimed.
+  - Add plot costs and plot group information to the /plot perm hud when applicable.
+    - Closes #7173.
+0.100.0.21:
+  - Prevent the drops that spawn from problem blocks which can be duped in explosion regenerations.
+    - These were things like carpets, pressureplates and other blocks that attach to blocks.
+    - Closes #7154, #5689.
+  - Add claiming particle effect.
+  - New Config Option: claiming.show_claiming_particles
+    - Default: true
+    - When false players will not see the particle flood effect when they claim townblocks.
+  - API: New CommandAddonAPI for /town buy, courtesy of lexiccn with PR #7177. (First-Time Contributor!)
+    - It is now possible for other plugins to add subcommands to the /town buy command.
+    - Closes #6379.
+  - New Permission Node: towny.command.town.buy.*
+    - Child Nodes:
+      - towny.command.town.buy.bonus - Allows mayors to use /t buy bonus.
+      - No change required in your townyperms.yml,
+        the old node towny.command.town.buy will continue to point to towny.command.town.buy.bonus,
+        although it is recommended you change over to using the new towny.command.town.buy.* instead.
+  - Bump com.github.seeseemelk:MockBukkit-v1.20 from 3.58.0 to 3.60.0.
+  - Bump net.coreprotect:coreprotect from 22.2 to 22.3.
+0.100.0.22:
+  - Refactor the parseJailCommand method.
+  - Refactor the parseTownClaimCommand method.
+  - Fix new outlaws being teleported when they have in fact left the town's borders.
+  - Fix residents being able to see vanished online players who are in their town.
+  - Refactor the townRank method.
+  - Add claiming particle effect when new towns are made.
+0.100.1.0:
+  - Bump version for release.
+0.100.1.1:
+  - Refactor parts of the TownCommand class:
+    - Refactor townAddResident method.
+    - Refactor the town join command.
+    - Refactor townSet and the subcommands.
+  - Refactor the TownyWorldCommand class.
+  - Refactor the PlotClaim task.
+  - API: Added new methods to TownyAPI class to determine claim-ability:
+    - TownyAPI#testTownClaimOrThrow(Town town, WorldCoord coordToClaim, boolean outpost, boolean newTown)
+    - TownyAPI#testTownUnclaimOrThrow(Town town, WorldCoord coordToUnclaim)
+  - Create Town object methods for determining if a town has enough residents to be a part of a nation, or to be the capital of a nation.
+    - Moves backing logic into TownUtil.
+  - Remove some verbose boolean returns.
+  - Fix issues discovered in HealthRegenTimerTask where saturation gain was being unable to happen consistently when server TPS drops.
+    - Code is now run Async during player evaluation, becoming Sync'd when we are about to heal someone.
+    - Towny now properly uses the EntityRegainHealthEvent, reporting the correct amount of health gain, as well as not healing players if this event is cancelled. 
+  - Added config option to turn on/off the saturation top-up that goes along with the health-regen in towns. 
+  - New Config Option: global_town_settings.saturation_regen.also_prevent_saturation_loss
+    - Default: true
+    - When true players cannot become hungrier when in their own or an allied town.
+  - Refactor the TownCommand's town kicking method, and decouple the admin version of town kicking.
+0.100.1.2:
+  - Fix non-mayors being able to add non-kickable-ranked residents as outlaws, which would have allowed them to be kicked.
+  - Refactor MapHUD class.
+  - Refactor onEntityChangeBlockEvent method.
+  - Fix returning null in the relational placeholder code, returning the no-relation colour instead.
+  - Refactor some of TownyFormatter's methods, mainly moving some component-creation out into their related Util classes.
+  - Add NationUtil.
+  - Move max allies test into NationUtil.
+  - Add more nation-joining tests to the NationUtil.
+  - Refactor nation adding towns in the NationCommand class.
+0.100.1.3:
+  - Refactor townAdd method to better handle adding and revoking invites.
+  - Fix not being able to add towns to nations when the residents-per-nation setting is 0.
+  - Add a configurable amount of bonus townblocks given to new towns.
+    - Closes #7195.
+  - New Config Option: claiming.new_town_bonus_claims
+    - Default: 0
+    - An amount of additional townblocks that a town will receive when it is first created, in addition to any amount given via the town_block_ratio or town_levels.
+    - As an example: This can be used to add 10 townblocks to a town when it is made so the borders can be grown a bit more before the mayor has to seek out residents.
+0.100.1.4:
+  - Refactor max residents per town code into TownUtil accessed via a new Town method.
+  - Bump Spigot 1.20.2 to 1.20.4.
+  - Bump com.github.seeseemelk:MockBukkit-v1.20 from 3.60.0 to 3.65.0.
+  - Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.3 to 3.2.5.

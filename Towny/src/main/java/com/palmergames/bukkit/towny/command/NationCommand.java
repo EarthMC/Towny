@@ -110,6 +110,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 		"withdraw",
 		"deposit",
 		"new",
+		"create",
 		"add",
 		"kick",
 		"delete",
@@ -692,13 +693,13 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 			if (nation.hasSanctionedTown(town))
 				throw new TownyException(Translatable.of("msg_err_cannot_join_nation_sanctioned_town", nation.getName()));
 
-			if (!testTownHasEnoughResidents(town))
+			if (!town.hasEnoughResidentsToJoinANation())
 				throw new TownyException(Translatable.of("msg_err_not_enough_residents_join_nation", town.getName()));
 
-			if (!testNationMaxTowns(nation))
+			if (nation.hasReachedMaxTowns())
 				throw new TownyException(Translatable.of("msg_err_nation_over_town_limit", TownySettings.getMaxTownsPerNation()));
 
-			if (!testNationMaxResidents(nation, town))
+			if (!nation.canAddResidents(town.getNumResidents()))
 				throw new TownyException(Translatable.of("msg_err_cannot_join_nation_over_resident_limit", TownySettings.getMaxResidentsPerNation()));
 
 			if (TownySettings.getNationProximityToCapital() > 0)
@@ -707,9 +708,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 			// Check if the command is not cancelled
 			BukkitTools.ifCancelledThenThrow(new NationPreAddTownEvent(nation, town));
 
-			List<Town> towns = new ArrayList<>();
-			towns.add(town);
-			nationAdd(nation, towns);
+			nationAdd(nation, town);
 
 		} catch (TownyException e) {
 			TownyMessaging.sendErrorMsg(player, e.getMessage(player));
@@ -918,19 +917,20 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 
 	private void newNation(Player player, String[] split) throws TownyException {
 		Resident resident = getResidentOrThrow(player);
-		if (TownySettings.getNumResidentsCreateNation() > 0 && resident.getTown().getNumResidents() < TownySettings.getNumResidentsCreateNation())
+		Town town = getTownFromResidentOrThrow(resident);
+		if (!town.hasEnoughResidentsToBeANationCapital())
 			throw new TownyException(Translatable.of("msg_err_not_enough_residents_new_nation"));
 
 		if (split.length == 1)
 			throw new TownyException(Translatable.of("msg_specify_nation_name"));
 
-		if (!resident.isMayor() && !resident.getTown().hasResidentWithRank(resident, "assistant"))
+		if (!resident.isMayor() && !town.hasResidentWithRank(resident, "assistant"))
 			throw new TownyException(Translatable.of("msg_peasant_right"));
 		
 		boolean noCharge = TownySettings.getNewNationPrice() == 0.0 || !TownyEconomyHandler.isActive();
 		
 		String nationName = String.join("_", StringMgmt.remFirstArg(split));
-		newNation(player, nationName, resident.getTown(), noCharge);
+		newNation(player, nationName, town, noCharge);
 	}
 	
 	public static void newNation(Player player, String name, Town capitalTown, boolean noCharge) {
@@ -1089,10 +1089,12 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 		boolean tooManyResidents = false;
 		if (town.isCapital()) {
 			// Check that the capital wont have too many residents after deletion. 
-			tooManyResidents = TownySettings.getMaxResidentsPerTown() > 0 && TownySettings.getMaxResidentsPerTownCapitalOverride() > 0 && town.getNumResidents() > TownySettings.getMaxResidentsPerTown(); 
+			tooManyResidents = town.isAllowedThisAmountOfResidents(town.getNumResidents(), false);
 			// Show a message preceding the confirmation message if they will lose residents. 
-			if (tooManyResidents)
-				TownyMessaging.sendMsg(player, Translatable.of("msg_deleting_nation_will_result_in_losing_residents", TownySettings.getMaxResidentsPerTown(), town.getNumResidents() - TownySettings.getMaxResidentsPerTown()));
+			if (tooManyResidents) {
+				int maxResidentsPerTown = TownySettings.getMaxResidentsPerTown();
+				TownyMessaging.sendMsg(player, Translatable.of("msg_deleting_nation_will_result_in_losing_residents", maxResidentsPerTown, town.getNumResidents() - maxResidentsPerTown));
+			}
 		}
 		final boolean finalTooManyResidents = tooManyResidents;
 		Confirmation.runOnAccept(() -> {
@@ -1120,10 +1122,12 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 				Town town = getTownFromResidentOrThrow(resident);
 				Nation nation = getNationFromResidentOrThrow(resident);
 				// Check that the capital wont have too many residents after deletion. 
-				boolean tooManyResidents = TownySettings.getMaxResidentsPerTown() > 0 && TownySettings.getMaxResidentsPerTownCapitalOverride() > 0 && town.getNumResidents() > TownySettings.getMaxResidentsPerTown(); 
+				boolean tooManyResidents = !town.isAllowedThisAmountOfResidents(town.getNumResidents(), false); 
 				// Show a message preceding the confirmation message if they will lose residents. 
-				if (tooManyResidents)
-					TownyMessaging.sendMsg(player, Translatable.of("msg_deleting_nation_will_result_in_losing_residents", TownySettings.getMaxResidentsPerTown(), town.getNumResidents() - TownySettings.getMaxResidentsPerTown()));
+				if (tooManyResidents) {
+					int maxResidentsPerTown = TownySettings.getMaxResidentsPerTown();
+					TownyMessaging.sendMsg(player, Translatable.of("msg_deleting_nation_will_result_in_losing_residents", maxResidentsPerTown, town.getNumResidents() - maxResidentsPerTown));
+				}
 
 				Confirmation.runOnAccept(() -> {
 					TownyMessaging.sendGlobalMessage(Translatable.of("msg_del_nation", nation.getName()));
@@ -1174,7 +1178,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 
 		Nation nation = getNationFromPlayerOrThrow(player);
 		
-		if (!testNationMaxTowns(nation))
+		if (nation.hasReachedMaxTowns())
 			throw new TownyException(Translatable.of("msg_err_nation_over_town_limit", TownySettings.getMaxTownsPerNation()));
 
 		// The list of valid invites.
@@ -1212,7 +1216,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 				continue;
 			}
 
-			if (!testNationMaxResidents(nation, town)) {
+			if (!nation.canAddResidents(town.getNumResidents())) {
 				// Town has too many residents to join the nation
 				removeinvites.add(townname);
 				TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_cannot_join_nation_over_resident_limit", TownySettings.getMaxResidentsPerNation(), townname));
@@ -1257,7 +1261,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 				continue;
 			}	
 
-			if (!testTownHasEnoughResidents(town)) {
+			if (!town.hasEnoughResidentsToJoinANation()) {
 				TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_not_enough_residents_join_nation", town.getName()));
 				continue;
 			}
@@ -1288,63 +1292,61 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 
 	/**
 	 * Final stage of adding towns to a nation.
-	 * @param nation - Nation being added to.
-	 * @param towns - List of Town(s) being added to Nation.
-	 * @throws AlreadyRegisteredException - Shouldn't happen but could.
+	 * 
+	 * @deprecated since 0.100.1.2 use {@link #nationAdd(Nation, Town)} instead.
+	 * @param nation Nation being added to.
+	 * @param towns  List of Town(s) being added to Nation.
 	 */
-	public static void nationAdd(Nation nation, List<Town> towns) throws AlreadyRegisteredException {
-		for (Town town : towns) {
-			if (!town.hasNation()) {
-				if (!testNationMaxTowns(nation)) {
-					// Nation has hit the max-towns limit.
-					TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_err_nation_over_town_limit", TownySettings.getMaxTownsPerNation()));
-					TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_err_cannot_join_nation_over_town_limit", TownySettings.getMaxTownsPerNation()));
-					continue;
-				}
+	@Deprecated
+	public static void nationAdd(Nation nation, List<Town> towns) {
+		for (Town town : towns)
+			nationAdd(nation, town);
+	}
 
-				if (!testTownHasEnoughResidents(town)) {
-					// Town has dropped below min.-residents-to-join-nation limit. 
-					TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_err_not_enough_residents_join_nation", town.getName()));
-					TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_err_not_enough_residents_join_nation", town.getName()));
-					continue;
-				}
-
-				if (!testNationMaxResidents(nation, town)) {
-					// Nation has hit the max-residents limit.
-					TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_err_cannot_add_nation_over_resident_limit", TownySettings.getMaxResidentsPerNation(), town.getName()));
-					TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_err_cannot_join_nation_over_resident_limit", TownySettings.getMaxResidentsPerNation()));
-					continue;
-				}
-
-				town.setNation(nation);
-				town.save();
-				TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_join_nation", StringMgmt.remUnderscore(town.getName())));
-			}
-
+	/**
+	 * Final stage of adding a town to a nation, via joining or via accepting an
+	 * invite. We re-test the rules for joining a nation in case the town or
+	 * nation's situation has changed since being sent the invite/join confirmation.
+	 * 
+	 * @param nation Nation which would take on a new Town.
+	 * @param town   Town which would join the nation.
+	 */
+	public static void nationAdd(Nation nation, Town town) {
+		if (town.hasNation()) {
+			TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_err_town_already_belong_nation", town.getName(), town.getNationOrNull().getName()));
+			TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_err_already_belong_nation"));
+			return;
 		}
-		plugin.resetCache();
-		nation.save();
 
-	}
-	
-	private static boolean testNationMaxResidents(Nation nation, Town town) {
-		int maxResidentPerNation = TownySettings.getMaxResidentsPerNation();
-		if (maxResidentPerNation < 1)
-			return true;
-		return !(nation.getResidents().size() + town.getResidents().size() > maxResidentPerNation);
+		if (!town.hasEnoughResidentsToJoinANation()) {
+			// Town has dropped below min.-residents-to-join-nation limit. 
+			TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_err_not_enough_residents_join_nation", town.getName()));
+			TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_err_not_enough_residents_join_nation", town.getName()));
+			return;
+		}
 
-	}
+		if (nation.hasReachedMaxTowns()) {
+			// Nation has hit the max-towns limit.
+			TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_err_nation_over_town_limit", TownySettings.getMaxTownsPerNation()));
+			TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_err_cannot_join_nation_over_town_limit", TownySettings.getMaxTownsPerNation()));
+			return;
+		}
 
-	private static boolean testTownHasEnoughResidents(Town town) {
-		if (TownySettings.getNumResidentsJoinNation() < 1)
-			return true;
-		return !(town.getNumResidents() < TownySettings.getNumResidentsJoinNation());
-	}
+		if (!nation.canAddResidents(town.getNumResidents())) {
+			// Nation has hit the max-residents limit.
+			TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_err_cannot_add_nation_over_resident_limit", TownySettings.getMaxResidentsPerNation(), town.getName()));
+			TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("msg_err_cannot_join_nation_over_resident_limit", TownySettings.getMaxResidentsPerNation()));
+			return;
+		}
 
-	private static boolean testNationMaxTowns(Nation nation) {
-		if (TownySettings.getMaxTownsPerNation() < 1)
-			return true;
-		return !(nation.getTowns().size() >= TownySettings.getMaxTownsPerNation());
+		try {
+			town.setNation(nation);
+		} catch (AlreadyRegisteredException ignored) {}
+		town.save();
+		TownyMessaging.sendPrefixedNationMessage(nation, Translatable.of("msg_join_nation", StringMgmt.remUnderscore(town.getName())));
+
+		// Reset the town's player cache to account for potential new plot permissions.
+		TownyAPI.getInstance().getOnlinePlayers(town).forEach(p-> plugin.resetCache(p));
 	}
 
 	private static void nationRevokeInviteTown(CommandSender sender, Nation nation, List<Town> towns) {
@@ -1654,7 +1656,7 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 		if (toAccept != null) {
 			
 			// Nation has reached the max amount of allies
-			if (TownySettings.getMaxNationAllies() >= 0 && nation.getAllies().size() >= TownySettings.getMaxNationAllies()) {
+			if (nation.hasReachedMaximumAllies()) {
 				toAccept.getReceiver().deleteReceivedInvite(toAccept);
 				toAccept.getSender().deleteSentInvite(toAccept);
 				TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_ally_limit_reached"));
@@ -2317,13 +2319,13 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 			return;
 		}
 
-		boolean capitalNotEnoughResidents = TownySettings.getNumResidentsCreateNation() > 0 && newCapital.getNumResidents() < TownySettings.getNumResidentsCreateNation();
+		boolean capitalNotEnoughResidents = !newCapital.hasEnoughResidentsToBeANationCapital();
 		if (capitalNotEnoughResidents && !admin) {
 			TownyMessaging.sendErrorMsg(sender, Translatable.of("msg_not_enough_residents_capital", newCapital.getName()));
 			return;
 		}
 		
-		boolean capitalTooManyResidents = TownySettings.getMaxResidentsPerTown() > 0 && nation.getCapital().getNumResidents() > TownySettings.getMaxResidentsPerTown();
+		boolean capitalTooManyResidents = !existingCapital.isAllowedThisAmountOfResidents(existingCapital.getNumResidents(), false); 
 		if (capitalTooManyResidents && !admin) {
 			TownyMessaging.sendErrorMsg(sender, Translatable.of("msg_err_nation_capital_too_many_residents", newCapital.getName()));
 			return;

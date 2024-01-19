@@ -129,6 +129,7 @@ town_trust_help_2: "Lists the Trusted residents of a town."
 town_towntrust_help_0: "Adds a town as Trusted in the town."
 town_towntrust_help_1: "Removes a town as Trusted in the town."
 town_towntrust_help_2: "Lists the Trusted towns of a town."
+town_buy_help: "Purchases bonus townblocks to increase the claim limit of the town."
 mayor_help_3: 'Anspruchsbereich grenzt nicht an die Stadt.'
 mayor_help_4: 'Beanspruche Land um dich herum in einem Radius von X'
 mayor_help_5: 'Beanspruche Land mit dem maximalen Radius'
@@ -423,6 +424,7 @@ msg_plot_fs_radius: 'Put up a radius of plots for sale.'
 ############################################################
 msg_buy: '&bKaufte %d %s für %s.'
 msg_buy_resident_plot: '&b%s kaufte %s'' Grundstück für %s!'
+msg_buy_resident_plot_group: '&b%s bought %s''s plotgroup for %s!'
 msg_couldnt_pay_taxes: '&b%s konnte die Steuern nicht bezahlen und wurde deshalb aus %s rausgeschmissen.'
 msg_couldnt_pay_plot_taxes: '&b%s konnte die Steuern für die Plots nicht bezahlen und verliert den Anspruch auf ein Grundstück.'
 msg_payed_town_tax: '&bSteuern wurden bezahlt an '
@@ -620,6 +622,8 @@ msg_err_not_in_town_claim: '&cSolange du in keiner Stadt bist, kannst du keine B
 msg_err_must_belong_town: '&cDu musst einer Stadt angehören.'
 msg_err_dont_belong_town: '&cDu gehörst zu keiner Stadt.'
 msg_err_dont_belong_nation: '&bDu gehörst zu keiner Nation.'
+msg_err_already_belong_nation: '&bYou already belong to a nation.'
+msg_err_town_already_belong_nation: '&b%s already belongs to a nation: %s.'
 msg_err_not_same_nation: '&b%s gehört nicht zu deiner Nation.'
 msg_err_rect_auto: '&cNur Städte oder Bürger können ''auto'' benutzen.'
 msg_err_invalid_radius: '&cUngültiger Radius. Benutze eine ganze Zahl oder ''auto''.'
@@ -795,7 +799,7 @@ msg_err_nation_sent_too_many_requests: '&bDie Nation hat zu viele Anfragen verse
 msg_err_nation_has_too_many_requests: '&bNation %s hat zu viele Anfragen. Sie muss zuerst einige ablehnen, bevor sie wieder Anfragen senden kann.'
 player_received_invites: '&bDu hast %a/%m Einladungen empfangen.'
 town_revoke_invite: '&Stadt %s, iht ihre Einladung zurückgezogen ihnen beizutreten.'
-town_revoke_invite_successful: '&bDu hast eine Einladung zum Beitritt der Stadt erfolgreich widerrufen.'
+town_revoke_invite_successful: '&bYou have successfully revoked an invite to join your town sent to %s.'
 town_received_invites: '&bDie Stadt hat %a/%m Einladungen empfangen.'
 town_sent_invites: '&bDie Stadt hat %a/%m Einladungen gesendet.'
 nation_revoke_invite: '&bNation %s, hat ihre Einladung zurückgezogen ihnen beizutreten.'
@@ -1876,6 +1880,14 @@ msg_perm_hud_nation: 'nation'
 msg_perm_hud_outsider: 'außenseiter'
 #Seen in /plot perm hud:
 msg_perm_hud_plot_name: 'Grundstück: '
+#Seen in /plot perm hud:
+msg_perm_hud_plotgroup_name: 'Plot Group: '
+#Seen in /plot perm hud:
+msg_perm_hud_plot_for_sale: 'For Sale: '
+#Seen in /plot perm hud:
+msg_perm_hud_no: 'No'
+#Seen in /plot perm hud:
+msg_perm_hud_yes: 'Yes'
 #Added in 0.153
 #Message shown confirming /ta town NAME settownlevel # command.
 msg_town_level_overridden_with: 'In der Stadt %s wurde das Stadtlevel auf %s gesetzt.'
@@ -2079,3 +2091,8 @@ msg_err_cannot_nation_spawn_your_town_is_sanctioned: "Your town is sanctioned by
 msg_err_cannot_claim_the_following_worldcoords_because_of_unwanted_biome: "The following coordinate(s) cannot be claimed because they contain too much of an unwanted biome: %s."
 msg_err_cannot_claim_the_following_worldcoords_because_of_ocean_biome: "The following coordinate(s) cannot be claimed because they contain too much ocean biome: %s."
 msg_err_cannot_begin_town_in_this_biome: "You cannot start a town in this biome."
+msg_err_cannot_overclaim_this_town_because_they_arent_your_enemy: "You are not able to overclaim this town because your nation does not consider their nation an enemy."
+msg_err_unable_to_command_outside_of_town: 'You cannot use that command outside of your town.'
+msg_err_unable_to_use_bank_outside_bank_plot_no_homeblock: 'You cannot use that command outside of a bank plot.'
+msg_err_you_cannot_outlaw_your_mayor: "You cannot outlaw your town's mayor."
+msg_err_you_cannot_outlaw_because_of_rank: "You cannot outlaw %s because of a town rank they hold."
