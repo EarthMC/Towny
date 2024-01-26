@@ -299,7 +299,7 @@ public class TownyPlayerListener implements Listener {
 	/*
 	* Handles Blocks for Itemuse & Switch test.
 	*/
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 
 		if (plugin.isError()) {
