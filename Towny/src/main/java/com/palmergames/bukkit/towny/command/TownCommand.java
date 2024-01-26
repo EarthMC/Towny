@@ -2618,7 +2618,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		}
 		
 		if (TownySettings.isTownTagSetAutomatically())
-			town.setTag(name.substring(0, Math.min(name.length(), TownySettings.getMaxTagLength())).replace("_","").replace("-", ""));
+			town.setTag(NameUtil.getTagFromName(name));
 		
 		resident.save();
 		townBlock.save();
@@ -3359,6 +3359,10 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 			// Fast fail when we're claiming a single worldcoord and it is already claimed.
 			if (selection.size() == 1 && playerWorldCoord.hasTownBlock())
 				throw new TownyException(Translatable.of("msg_already_claimed", playerWorldCoord.getTownOrNull()));
+
+			// If selection is greater than 1 check for the multiclaim node.
+			if (selection.size() > 1)
+				checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_CLAIM_TOWN_MULTIPLE.getNode());	
 		}
 
 		if (selection.isEmpty())
