@@ -8,6 +8,7 @@ import com.palmergames.bukkit.towny.TownyTimerHandler;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.event.BedExplodeEvent;
 import com.palmergames.bukkit.towny.event.PlayerChangePlotEvent;
+import com.palmergames.bukkit.towny.event.TitleNotificationEvent;
 import com.palmergames.bukkit.towny.event.executors.TownyActionEventExecutor;
 import com.palmergames.bukkit.towny.event.player.PlayerDeniedBedUseEvent;
 import com.palmergames.bukkit.towny.event.player.PlayerEntersIntoTownBorderEvent;
@@ -16,7 +17,6 @@ import com.palmergames.bukkit.towny.event.player.PlayerKeepsExperienceEvent;
 import com.palmergames.bukkit.towny.event.player.PlayerKeepsInventoryEvent;
 import com.palmergames.bukkit.towny.hooks.PluginIntegrations;
 import com.palmergames.bukkit.towny.object.CommandList;
-import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.PlayerCache;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
@@ -25,6 +25,7 @@ import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.object.TownyPermission.ActionType;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.jail.UnJailReason;
+import com.palmergames.bukkit.towny.object.notification.TitleNotification;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
@@ -42,8 +43,6 @@ import com.palmergames.bukkit.util.ChatTools;
 import com.palmergames.bukkit.util.EntityLists;
 import com.palmergames.bukkit.util.ItemLists;
 import com.palmergames.util.JavaUtil;
-import com.palmergames.util.StringMgmt;
-
 import io.papermc.lib.PaperLib;
 
 import org.bukkit.Bukkit;
@@ -92,8 +91,6 @@ import org.bukkit.metadata.MetadataValue;
 import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Handle events for all Player related events
@@ -218,7 +215,7 @@ public class TownyPlayerListener implements Listener {
 		respawn = TownyAPI.getInstance().getTownSpawnLocation(player);
 
 		// Towny might be prioritizing bed spawns over town spawns.
-		if (TownySettings.getBedUse()) { 
+		if (TownySettings.getBedUse()) {
 			Location bed = player.getBedSpawnLocation();
 			if (bed != null)
 				respawn = bed;
@@ -1041,46 +1038,24 @@ public class TownyPlayerListener implements Listener {
 	 * Currently used for:
 	 *   - showing NotificationsUsingTitles upon entering a town.
 	 *   
-	 * @param event - PlayerEnterTownEvent
+	 * @param event PlayerEntersIntoTownBorderEvent
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerEnterTown(PlayerEntersIntoTownBorderEvent event) {
-		
-		Resident resident = TownyUniverse.getInstance().getResident(event.getPlayer().getUniqueId());
+		Resident resident = event.getResident();
 		Town town = event.getEnteredTown();
-		
-		if (resident != null && resident.isSeeingBorderTitles() && town != null && TownySettings.isNotificationUsingTitles()) {
-			String title = ChatColor.translateAlternateColorCodes('&', TownySettings.getNotificationTitlesTownTitle());
-			String subtitle = ChatColor.translateAlternateColorCodes('&', TownySettings.getNotificationTitlesTownSubtitle());
-			
-			HashMap<String, Object> placeholders = new HashMap<>();
-			placeholders.put("{townname}", StringMgmt.remUnderscore(TownySettings.isNotificationsTownNamesVerbose() ? town.getFormattedName() : town.getName()));
-			placeholders.put("{town_motd}", town.getBoard());
-			placeholders.put("{town_residents}", town.getNumResidents());
-			placeholders.put("{town_residents_online}", TownyAPI.getInstance().getOnlinePlayers(town).size());
+		if (resident == null || town == null)
+			return;
 
-			Nation nation = town.getNationOrNull();
-			placeholders.put("{nationname}", nation == null ? "" : String.format(TownySettings.getNotificationTitlesNationNameFormat(), nation.getName()));
-			placeholders.put("{nation_residents}", nation == null ? "" : nation.getNumResidents());
-			placeholders.put("{nation_residents_online}", nation == null ? "" : TownyAPI.getInstance().getOnlinePlayers(nation).size());
-			placeholders.put("{nation_motd}", nation == null ? "" : nation.getBoard());
-			placeholders.put("{nationcapital}", !town.isCapital() ? "" : getCapitalSlug(town.getName(), nation.getName()));
-
-			for(Map.Entry<String, Object> placeholder: placeholders.entrySet()) {
-				title = title.replace(placeholder.getKey(), placeholder.getValue().toString());
-				subtitle = subtitle.replace(placeholder.getKey(), placeholder.getValue().toString());
-			}
+		if (TownySettings.isNotificationUsingTitles() && resident.isSeeingBorderTitles()) {
+			TitleNotificationEvent tne = new TitleNotificationEvent(new TitleNotification(town, event.getTo()), event.getPlayer());
+			BukkitTools.fireEvent(tne);
+			String title = tne.getTitleNotification().getTitleNotification();
+			String subtitle = tne.getTitleNotification().getSubtitleNotification();
 			TownyMessaging.sendTitleMessageToResident(resident, title, subtitle, TownySettings.getNotificationTitlesDurationTicks());
 		}
 	}
 	
-	private Object getCapitalSlug(String townName, String nationName) {
-		String format = TownySettings.getNotificationTitlesNationCapitalFormat();
-		if (format.contains("%t") || format.contains("%n"))
-			return format.replace("%t", townName).replace("%n", nationName);
-		else 
-			return String.format(format, nationName, townName);
-	}
 
 	/**
 	 * PlayerLeaveTownEvent
@@ -1088,32 +1063,20 @@ public class TownyPlayerListener implements Listener {
 	 *   - showing NotificationsUsingTitles upon entering the wilderness.
 	 *   - unjailing residents
 	 *   
-	 * @param event - PlayerLeaveTownEvent
+	 * @param event PlayerExitsFromTownBorderEvent
 	 */
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerLeaveTown(PlayerExitsFromTownBorderEvent event) {
-		Resident resident = TownyAPI.getInstance().getResident(event.getPlayer().getUniqueId());
-		String worldName = TownyAPI.getInstance().getTownyWorld(event.getPlayer().getWorld()).getFormattedUnclaimedZoneName();
-
+		Resident resident = event.getResident();
 		// Likely a Citizens NPC.
-		if (resident == null || worldName == null)
+		if (resident == null || !event.getTo().isWilderness())
 			return;
-		
-		if (TownySettings.isNotificationUsingTitles() && resident.isSeeingBorderTitles() && event.getTo().getTownBlockOrNull() == null) {
-			String title = ChatColor.translateAlternateColorCodes('&', TownySettings.getNotificationTitlesWildTitle());
-			String subtitle = ChatColor.translateAlternateColorCodes('&', TownySettings.getNotificationTitlesWildSubtitle());
-			if (title.contains("{wilderness}")) {
-				title = title.replace("{wilderness}", worldName);
-			}
-			if (subtitle.contains("{wilderness}")) {
-				subtitle = subtitle.replace("{wilderness}", worldName);
-			}
-			if (title.contains("{townname}")) {
-				subtitle = subtitle.replace("{townname}", StringMgmt.remUnderscore(event.getFrom().getTownOrNull().getName()));
-			}
-			if (subtitle.contains("{townname}")) {
-				subtitle = subtitle.replace("{townname}", StringMgmt.remUnderscore(event.getFrom().getTownOrNull().getName()));
-			}
+
+		if (TownySettings.isNotificationUsingTitles() && resident.isSeeingBorderTitles()) {
+			TitleNotificationEvent tne = new TitleNotificationEvent(new TitleNotification(event.getLeftTown(), event.getTo()), event.getPlayer());
+			BukkitTools.fireEvent(tne);
+			String title = tne.getTitleNotification().getTitleNotification();
+			String subtitle = tne.getTitleNotification().getSubtitleNotification();
 			TownyMessaging.sendTitleMessageToResident(resident, title, subtitle, TownySettings.getNotificationTitlesDurationTicks());
 		}
 
