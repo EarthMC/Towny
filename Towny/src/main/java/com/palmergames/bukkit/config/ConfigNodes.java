@@ -1484,7 +1484,7 @@ public enum ConfigNodes {
 			"*",
 			"",
 			"# Configure what contexts to enable/disable here, contexts must be separated by a comma.",
-			"# Available contexts: towny:resident, towny:mayor, towny:king, towny:insidetown, towny:insideowntown, towny:insideownplot, towny:townrank",
+			"# Available contexts: towny:resident, towny:nation_resident, towny:mayor, towny:king, towny:insidetown, towny:insideowntown, towny:insideownplot, towny:townrank",
 			"# towny:nationrank, towny:town, towny:nation"
 	),
 	
@@ -1541,7 +1541,7 @@ public enum ConfigNodes {
 			"plugin.hour_timer.hour_interval",
 			"60m",
 			"",
-			"# The number of minutes in each \"day\".",
+			"# The number of minutes in each \"hour\".",
 			"# Default is 60m."),
 	PLUGIN_NEWHOUR_TIME(
 			"plugin.hour_timer.new_hour_time",

@@ -344,7 +344,7 @@ public class TownyEntityListener implements Listener {
 	}
 
 	private boolean entityIsExempt(LivingEntity livingEntity, CreatureSpawnEvent.SpawnReason spawnReason) {
-		return PluginIntegrations.getInstance().checkCitizens(livingEntity)
+		return PluginIntegrations.getInstance().isNPC(livingEntity)
 			|| entityIsExemptByName(livingEntity)
 			|| MobRemovalTimerTask.isSpawnReasonIgnored(livingEntity, spawnReason);
 	}
@@ -928,11 +928,9 @@ public class TownyEntityListener implements Listener {
 
 				// Account for PotionEffect#getType possibly returning the new name post enum removal.
 				final String legacyName = POTION_LEGACY_NAMES.inverse().get(name);
-				if (legacyName != null && detrimentalPotions.contains(legacyName))
-					return true;
 
-				return false;
-			});
+                return legacyName != null && detrimentalPotions.contains(legacyName);
+            });
 	}
 	
 	@ApiStatus.Internal

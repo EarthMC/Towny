@@ -799,12 +799,29 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 	}
 
 	private void parseTownInviteSentCommand(Player player, String[] args, Resident resident, String sent) throws TownyException {
+		if (args.length == 0) {
+			listTownSentInvites(player, args, resident, sent);
+			return;
+		}
+		switch (args[0].toLowerCase(Locale.ROOT)) {
+		case "removeall" -> removeAllTownSentInvites(resident, player);
+		default -> HelpMenu.TOWN_INVITE.send(player);
+		}
+	}
+
+	private void listTownSentInvites(Player player, String[] args, Resident resident, String sent) throws TownyException {
 		checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_INVITE_LIST_SENT.getNode());
 
 		List<Invite> sentinvites = resident.getTown().getSentInvites();
 		int page = args.length > 0 ? MathUtil.getPositiveIntOrThrow(args[0]) : 1;
 		InviteCommand.sendInviteList(player, sentinvites, page, true);
 		TownyMessaging.sendMessage(player, sent);
+	}
+
+	private void removeAllTownSentInvites(Resident resident, Player player) throws TownyException {
+		checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_INVITE_ADD.getNode());
+		resident.getTown().getSentInvites().forEach(i -> i.decline(true));
+		TownyMessaging.sendMessage(player, Translatable.of("msg_all_of_your_towns_sent_invites_have_been_cancelled"));
 	}
 
 	private void parseTownInviteReceivedCommand(Player player, String[] args, Resident resident, String received) throws TownyException {
@@ -920,10 +937,10 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 
 	private static void parseTownOutlawAddCommand(CommandSender sender, boolean admin, Town town, Resident resident, Resident target) throws TownyException {
 		// Don't allow a resident to outlaw their own mayor.
-		if (resident.getTown().getMayor().equals(target))
+		if (town.getMayor().equals(target))
 			throw new TownyException(Translatable.of("msg_err_you_cannot_outlaw_your_mayor"));
 
-		if (!resident.isMayor() && TownySettings.getTownUnkickableRanks().stream().anyMatch(target::hasTownRank))
+		if (!resident.isMayor() && town.hasResident(target) && TownySettings.getTownUnkickableRanks().stream().anyMatch(target::hasTownRank))
 			throw new TownyException(Translatable.of("msg_err_you_cannot_outlaw_because_of_rank", target.getName()));
 
 		if (town.hasOutlaw(target))
@@ -3714,7 +3731,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 			// When determining the future-max outposts we have to determine how many towns the potential nation might have,
 			// nations can add bonus outposts to towns and the nation_level can be determined using the amount of towns a nation has.
 			int nationTownsAmount = !remainingTown.hasNation() ? 0 : remainingTown.getNationOrNull().getTowns().size();
-			if (remainingTown.getNationOrNull().hasTown(succumbingTown))
+			if (remainingTown.hasNation() && remainingTown.getNationOrNull().hasTown(succumbingTown))
 				nationTownsAmount--;
 
 			int maxOutposts = TownySettings.getMaxOutposts(remainingTown, newResidentsAmount, nationTownsAmount);

@@ -13,7 +13,7 @@
 
     <artifactId>towny</artifactId>
     <packaging>jar</packaging>
-    <version>0.100.1.7</version>
+    <version>0.100.1.11</version>
 
     <licenses>
         <license>
@@ -57,10 +57,6 @@
         <repository>
             <id>tne-repo</id>
             <url>https://repo.codemc.io/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>citizens-repo</id>
-            <url>https://repo.citizensnpcs.co/</url>
         </repository>
         <repository>
             <id>placeholderapi</id>
@@ -127,12 +123,6 @@
             <groupId>com.github.ElgarL</groupId>
             <artifactId>groupmanager</artifactId>
             <version>3.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.citizensnpcs</groupId>
-            <artifactId>citizensapi</artifactId>
-            <version>2.0.28-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- Included in vanilla minecraft's JAR -->
