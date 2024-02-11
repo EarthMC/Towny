@@ -3787,11 +3787,11 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 
 		// Prevent straight line claims if configured, and the town has enough townblocks claimed, and this is not an outpost.
 		ProximityUtil.testAdjacentClaimsRulesOrThrow(wc, town, false);
-
+/*
 		// Prevent claiming that would cut off a section of a town from the main body. 
 		if (takeoverWouldCutATownIntoTwoSections(wc, town))
 			throw new TownyException(Translatable.of("msg_err_you_cannot_over_claim_would_cut_into_two"));
-
+*/
 		// Filter out stealing land that is too close to another Town's homeblock.
 		if (TownySettings.isOverClaimingPreventedByHomeBlockRadius() && AreaSelectionUtil.isTooCloseToHomeBlock(wc, town))
 			throw new TownyException(Translatable.of("msg_too_close2", Translatable.of("homeblock")));
@@ -3807,7 +3807,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 			.setCost(new ConfirmationTransaction(() -> cost, town, "Takeover Claim (" + wc.toString() + ") from " + townName + "."))
 			.sendTo(player);
 	}
-
+/*
 	private boolean takeoverWouldCutATownIntoTwoSections(WorldCoord worldCoord, Town townOverClaiming) {
 		// If the surrounding townblocks has at least 2 townblocks owned by the
 		// overclaimed town and 1 plot that belongs to the wilderness or a third-town,
@@ -3823,7 +3823,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 				.count();
 		return wildOr3rdPartyOwned > 0;
 	}
-
+*/
 	private void parseTownBankHistoryCommand(final Player player, String[] split)
 			throws NoPermissionException, TownyException {
 		checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_BANKHISTORY.getNode());
