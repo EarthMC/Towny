@@ -194,7 +194,6 @@ public class TownyUniverse {
 
         long time = System.currentTimeMillis() - startTime;
         towny.getLogger().info("Database: Loaded in " + time + "ms.");
-        towny.getLogger().info("Database: " + TownySettings.getUUIDPercent() + " of residents have stored UUIDs."); // TODO: remove this when we're using UUIDs directly in the database.
 
         // Throw Event.
         BukkitTools.fireEvent(new TownyLoadedDatabaseEvent());
@@ -476,7 +475,7 @@ public class TownyUniverse {
 		
     	String formattedName;
 		try {
-			formattedName = NameValidation.checkAndFilterName(townName).toLowerCase(Locale.ROOT);
+			formattedName = NameValidation.checkAndFilterTownNameOrThrow(townName).toLowerCase(Locale.ROOT);
 		} catch (InvalidNameException e) {
 			return false;
 		}
@@ -500,7 +499,7 @@ public class TownyUniverse {
     	
 		String formattedName;
 		try {
-			formattedName = NameValidation.checkAndFilterName(townName).toLowerCase(Locale.ROOT);
+			formattedName = NameValidation.checkAndFilterTownNameOrThrow(townName).toLowerCase(Locale.ROOT);
 		} catch (InvalidNameException e) {
 			return null;
 		}
@@ -541,7 +540,7 @@ public class TownyUniverse {
 	}
 
 	private void newTown(String name, boolean assignUUID) throws AlreadyRegisteredException, InvalidNameException {
-		String filteredName = NameValidation.checkAndFilterName(name);
+		String filteredName = NameValidation.checkAndFilterTownNameOrThrow(name);
 
 		Town town = new Town(filteredName, assignUUID ? UUID.randomUUID() : null);
 		registerTown(town);
@@ -621,7 +620,7 @@ public class TownyUniverse {
 
 		String filteredName;
 		try {
-			filteredName = NameValidation.checkAndFilterName(nationName).toLowerCase(Locale.ROOT);
+			filteredName = NameValidation.checkAndFilterNationNameOrThrow(nationName).toLowerCase(Locale.ROOT);
 		} catch (InvalidNameException ignored) {
 			return false;
 		}
@@ -657,7 +656,7 @@ public class TownyUniverse {
 
 		String filteredName;
 		try {
-			filteredName = NameValidation.checkAndFilterName(nationName).toLowerCase(Locale.ROOT);
+			filteredName = NameValidation.checkAndFilterNationNameOrThrow(nationName).toLowerCase(Locale.ROOT);
 		} catch (InvalidNameException ignored) {
 			return null;
 		}

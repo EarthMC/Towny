@@ -9510,3 +9510,45 @@ v0.92.0.11:
   - New Command: /town invite sent removeall
     - Removes all of the invites which a town has sent.
     - Requires the towny.command.town.invite.add permission node to use (same node used for removing one by one.)
+0.100.1.12:
+  - Cause trusted residents who have changed their names to auto-matically carry their trusted status in a town over, without a server restart required.
+    - Closes #7249.
+  - Overhaul the NameValidation class.
+  - Add the towny.command.resident.jail to the nomad section of the townyperms.yml file, so that players without a town can pay bail if they're jailed. 
+  - Bump com.github.seeseemelk:MockBukkit-v1.20 from 3.65.0 to 3.72.0.
+0.100.1.13:
+  - Fix NameValidation issues.
+0.100.1.14:
+  - Fix missing feedback messages when a resident cannot pay their plot or town taxes.
+  - Add log messages describing why a town was deleted when it was ruined for too long, and when the last resident leaves town.
+  - Fix comod error when removing all sent invites, courtesy of Warrior with PR #7254.
+  - Bump org.junit.jupiter:junit-jupiter-api from 5.10.1 to 5.10.2.
+  - Bump org.junit.jupiter:junit-jupiter from 5.10.1 to 5.10.2.
+  - Add do-not-overwrite block list to worlds that affects wilderness explosion reverts.
+    - Prevents wilderness explosions from overwriting newly placed blocks, ie chests inside of creeper holes.
+    - Closes #7255.
+  - New Config Option: new_world_settings.plot_management.wild_revert_explosions_blocks_to_not_replace
+    - Default: ""
+    - This section is applied to new worlds as default settings when new worlds are detected.
+    - This is the list of blocks that should not be overwritten by wilderness explosion reverts.
+    - (if empty all blocks placed into regenerating explosions will be overwritten with the original pre-explosion blocks.)
+    - This list is useful if you have a death chest plugin which could put a player's inventory inside chest that is inside of a regenerating creeper explosion pit.
+    - For Example: By putting CHEST here you can prevent the chest from being overwritten by the dirt block that used to be there.
+0.100.1.15:
+  - Prevent falling blocks falling during unclaimed land regeneration.
+    - Closes #7259.
+  - Make use of the disallow numbers in town names config option again.
+  - Fix being unable to unset titles and surnames.
+  - Remove magic values from spawnpoint ring offsets, courtesy of Warrior with PR #7267.
+  - Fix mob removal on folia, courtesy of Warrior with PR #7262.
+    - Closes #7261, #7221, #7202, #7253.
+  - Make our custom registered commands identifiable, courtesy of Warrior with PR #7263.
+  - Move using_economy to the eco section of the config, courtesy of Warrior with PR #7265.
+  - Automatic config edit:
+    - plugin.interfacing.using_economy moves to economy.using_economy
+  - Remove uuid percentage tracking, courtesy of Warrior with PR #7266.
+  - Make PlotClaim a runnable, courtesy of Warrior with PR #7268.
+  - Reorganize test directory layout, courtesy of Warrior with PR #7269.
+0.100.1.16:
+  - Enabled /plot group toggle taxed command for plot groups.
+    - You can now properly enabled/disable plot taxes for groups of plots.

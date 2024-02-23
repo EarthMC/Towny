@@ -97,7 +97,6 @@ public class TownySettings {
 
 	private static CommentedConfiguration config;
 	private static CommentedConfiguration newConfig;
-	private static int uuidCount;
 	private static boolean areLevelTypeLimitsConfigured;
 
 	private static final SortedMap<Integer, TownLevel> configTownLevel = Collections.synchronizedSortedMap(new TreeMap<>(Collections.reverseOrder()));
@@ -1358,7 +1357,7 @@ public class TownySettings {
 	
 	public static boolean isUsingEconomy() {
 
-		return getBoolean(ConfigNodes.PLUGIN_USING_ECONOMY);
+		return getBoolean(ConfigNodes.ECO_USING_ECONOMY);
 	}
 
 	public static boolean isFakeResident(String name) {
@@ -1517,7 +1516,11 @@ public class TownySettings {
 	public static List<String> getWildExplosionRevertBlockWhitelist() {
 		return getStrArr(ConfigNodes.NWS_PLOT_MANAGEMENT_WILD_REVERT_BLOCK_WHITELIST);
 	}
-	
+
+	public static List<String> getWildExplosionRevertMaterialsToNotOverwrite() {
+		return getStrArr(ConfigNodes.NWS_PLOT_MANAGEMENT_WILD_REVERT_BLOCKS_TO_NOT_OVERWRITE);
+	}
+
 	public static List<String> getWildExplosionProtectionBlocks() {
 		return getStrArr(ConfigNodes.NWS_PLOT_MANAGEMENT_WILD_BLOCK_REVERT_LIST);
 	}
@@ -3376,41 +3379,6 @@ public class TownySettings {
 			townColorsMap.put(keyValuePair[0], keyValuePair[1]);
 		}
 		return townColorsMap;
-	}
-
-	public static String getUUIDPercent() {
-		double fraction = (double) uuidCount / TownyUniverse.getInstance().getNumResidents();
-		
-		if (fraction == 1.00)
-			return "100%";
-		if (fraction > 0.98)
-			return "99%";
-		if (fraction > 0.95)
-			return "95%+";
-		if (fraction > 0.89)
-			return "90%+";
-		if (fraction > 0.79)
-			return "80%+";
-		if (fraction > 0.69)
-			return "70%+";
-		if (fraction > 0.59)
-			return "60%+";	
-		if (fraction > 0.49)
-			return "50%+";
-		
-		return "<50%";
-	}
-
-	public static int getUUIDCount() {
-		return uuidCount;
-	}
-	
-	public static void setUUIDCount(int hasUUID) {
-		uuidCount = hasUUID;
-	}
-
-	public static void incrementUUIDCount() {
-		uuidCount++;
 	}
 	
 	public static boolean isTownBankruptcyEnabled() {

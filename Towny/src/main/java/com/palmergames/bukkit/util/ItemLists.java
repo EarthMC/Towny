@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -257,6 +256,11 @@ public class ItemLists extends AbstractRegistryList<Material> {
 		.add("CHORUS_FLOWER", "POINTED_DRIPSTONE")
 		.conditionally(() -> CURRENT_VERSION.isNewerThanOrEquals(MINECRAFT_1_20_3), builder -> builder.add("DECORATED_POT"))
 		.build();
+
+	public static final ItemLists FALLING_BLOCKS = newBuilder()
+			.add("SAND", "RED_SAND", "GRAVEL", "SUSPICIOUS_SAND", "SUSPICIOUS_GRAVEL")
+			.endsWith("_CONCRETE_POWDER")
+			.build();
 
 	/**
 	 * List of blocks which, when exploded, will not have their drops set to false, despite our asking.

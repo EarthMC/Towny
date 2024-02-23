@@ -668,13 +668,8 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 			townBlock.save();
 			return;
 		}
-		
-		String newName = StringMgmt.join(name, "_");
-		
-		// Test if the plot name contains invalid characters.
-		if (NameValidation.isBlacklistName(newName))
-			throw new TownyException(Translatable.of("msg_invalid_name"));
 
+		String newName = NameValidation.checkAndFilterPlotNameOrThrow(StringMgmt.join(name, "_"));
 		townBlock.setName(newName);
 		townBlock.save();
 		TownyMessaging.sendMsg(player, Translatable.of("msg_plot_name_set_to", townBlock.getName()));
@@ -729,7 +724,7 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 
 		if (split.length == 2 && split[1].equalsIgnoreCase("all")) {
 			// Start the unclaim task
-			new PlotClaim(plugin, player, resident, null, false, false, false).start();
+			plugin.getScheduler().runAsync(new PlotClaim(plugin, player, resident, null, false, false, false));
 			return;
 		}
 
@@ -745,7 +740,7 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 
 			if (!townBlock.hasPlotObjectGroup()) {
 				// Start the unclaim task
-				new PlotClaim(plugin, player, resident, selection, false, false, false).start();
+				plugin.getScheduler().runAsync(new PlotClaim(plugin, player, resident, selection, false, false, false));
 				return;
 			}
 
@@ -753,7 +748,7 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 			final List<WorldCoord> groupSelection = townBlock.getPlotObjectGroup().getTownBlocks().stream().map(TownBlock::getWorldCoord).collect(Collectors.toList());
 
 			// Create confirmation.
-			Confirmation.runOnAccept(() -> new PlotClaim(Towny.getPlugin(), player, resident, groupSelection, false, false, false).start())
+			Confirmation.runOnAcceptAsync(new PlotClaim(plugin, player, resident, groupSelection, false, false, false))
 				.setTitle(Translatable.of("msg_plot_group_unclaim_confirmation", townBlock.getPlotObjectGroup().getTownBlocks().size()).append(" ").append(Translatable.of("are_you_sure_you_want_to_continue")))
 				.sendTo(player);
 			return;
@@ -1236,9 +1231,11 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 		if (split.length != 2 && !resident.hasPlotGroupName())
 			throw new TownyException(Translatable.of("msg_err_plot_group_name_required"));
 
-		String plotGroupName = split.length == 2 ? NameValidation.filterName(split[1]) : 
-				resident.hasPlotGroupName() ? resident.getPlotGroupName() : null;
-		plotGroupName = NameValidation.filterCommas(plotGroupName);
+		String plotGroupName = split.length == 2
+				? NameValidation.checkAndFilterPlotGroupNameOrThrow(split[1])
+				: resident.hasPlotGroupName()
+					? resident.getPlotGroupName()
+					: null;
 
 		if (town.hasPlotGroupName(plotGroupName)) {
 			TownBlockType groupType = town.getPlotObjectGroupFromName(plotGroupName).getTownBlockType();
@@ -1662,6 +1659,9 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 		case "mobs":
 			checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_PLOT_TOGGLE_MOBS.getNode());
 			break;
+		case "taxed":
+			checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_PLOT_ASMAYOR.getNode());
+			break;
 		}
 
 		for (TownBlock groupBlock : plotGroup.getTownBlocks()) {
@@ -1686,6 +1686,9 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 					tryToggleTownBlockMobs(player, groupBlock, split, choice);
 					endingMessage = Translatable.of("msg_changed_mobs", Translatable.of("msg_the_plot_group"), groupBlock.getPermissions().mobs ? Translatable.of("enabled") : Translatable.of("disabled"));
 					break;
+				case "taxed":
+					 tryToggleTownBlockTaxed(player, groupBlock, split, choice);
+					 endingMessage = Translatable.of("msg_changed_plotgroup_taxed", groupBlock.isTaxed() ? Translatable.of("enabled") : Translatable.of("disabled"));
 				default:
 					TownyMessaging.sendErrorMsg(player, Translatable.of("msg_err_invalid_property", "plot"));
 					return;
@@ -1841,7 +1844,7 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 						group.getTownBlocks().forEach((tblock) -> coords.add(tblock.getWorldCoord()));
 
 						// Execute the plot claim.
-						new PlotClaim(Towny.getPlugin(), player, resident, coords, true, false, true).start();
+						plugin.getScheduler().runAsync(new PlotClaim(plugin, player, resident, coords, true, false, true));
 					})
 					.setTitle(Translatable.of("msg_plot_group_claim_confirmation", group.getTownBlocks().size()).append(" ").append(prettyMoney(group.getPrice())).append(". ").append(Translatable.of("are_you_sure_you_want_to_continue")))
 					.sendTo(player);
@@ -1874,16 +1877,15 @@ public class PlotCommand extends BaseCommand implements CommandExecutor {
 			throw new TownyException(Translatable.of("msg_no_funds_claim_plot", prettyMoney(cost)));
 
 		if (cost != 0) {
-			final List<WorldCoord> finalSelection = selection;
-			Confirmation.runOnAccept(() ->  {	
+			Confirmation.runOnAcceptAsync(
 				// Start the claim task
-				new PlotClaim(plugin, player, resident, finalSelection, true, false, false).start();
-			})
+				new PlotClaim(plugin, player, resident, selection, true, false, false)
+			)
 			.setTitle(Translatable.of("msg_confirm_purchase", prettyMoney(cost)))
 			.sendTo(player);
 		} else {
 			// Start the claim task
-			new PlotClaim(plugin, player, resident, selection, true, false, false).start();
+			plugin.getScheduler().runAsync(new PlotClaim(plugin, player, resident, selection, true, false, false));
 		}
 	}
 		

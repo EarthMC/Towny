@@ -649,8 +649,6 @@ public final class TownySQLSource extends TownyDatabaseHandler {
 	public boolean loadResidents() {
 		TownyMessaging.sendDebugMsg("Loading Residents");
 
-		TownySettings.setUUIDCount(0);
-
 		try (Connection connection = getConnection();
 			 Statement s = connection.createStatement();
 			 ResultSet rs = s.executeQuery("SELECT * FROM " + tb_prefix + "RESIDENTS")) {
@@ -675,10 +673,6 @@ public final class TownySQLSource extends TownyDatabaseHandler {
 					plugin.getLogger().severe("Loading Error: Could not read resident data '" + resident.getName() + "'.");
 					return false;
 				}
-				
-				if (resident.hasUUID())
-					TownySettings.incrementUUIDCount();
-
 			}
 		} catch (SQLException e) {
 			TownyMessaging.sendErrorMsg("SQL: Load resident sql error : " + e.getMessage());
@@ -1674,6 +1668,21 @@ public final class TownySQLSource extends TownyDatabaseHandler {
 				} catch (Exception ignored) {
 				}
 
+			line = rs.getString("wildRegenBlocksToNotOverwrite");
+			if (line != null)
+				try {
+					List<String> materials = new ArrayList<>();
+					search = (line.contains("#")) ? "#" : ",";
+					for (String split : line.split(search))
+						if (!split.isEmpty())
+							try {
+								materials.add(split.trim());
+							} catch (NumberFormatException ignored) {
+							}
+					world.setWildRevertMaterialsToNotOverwrite(materials);
+				} catch (Exception ignored) {
+				}
+
 			resultLong = rs.getLong("plotManagementWildRegenSpeed");
 			try {
 				world.setPlotManagementWildRevertDelay(resultLong);
@@ -2421,6 +2430,11 @@ public final class TownySQLSource extends TownyDatabaseHandler {
 			if (world.getPlotManagementWildRevertBlockWhitelist() != null)
 				nat_hm.put("PlotManagementWildRegenBlockWhitelist",
 						StringMgmt.join(world.getPlotManagementWildRevertBlockWhitelist(), "#"));
+
+			// Wilderness Explosion Protection Materials to not overwrite.
+			if (world.getWildRevertMaterialsToNotOverwrite() != null)
+				nat_hm.put("wildRegenBlocksToNotOverwrite",
+						StringMgmt.join(world.getWildRevertMaterialsToNotOverwrite(), "#"));
 
 			// Using PlotManagement Wild Regen Delay
 			nat_hm.put("plotManagementWildRegenSpeed", world.getPlotManagementWildRevertDelay());

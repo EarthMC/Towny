@@ -458,8 +458,17 @@ public enum ConfigNodes {
 	NWS_PLOT_MANAGEMENT_WILD_REVERT_BLOCK_WHITELIST(
 		"new_world_settings.plot_management.wild_revert_on_explosion_block_whitelist",
 		"",
-		"# The list of blocks to regenerate. (if empty all blocks will regenerate)"),
-
+		"# This section is applied to new worlds as default settings when new worlds are detected.",
+		"# The list of blocks to regenerate for block and entity explosions. (if empty all blocks will regenerate)"),
+	NWS_PLOT_MANAGEMENT_WILD_REVERT_BLOCKS_TO_NOT_OVERWRITE(
+			"new_world_settings.plot_management.wild_revert_explosions_blocks_to_not_replace",
+			"",
+			"# This section is applied to new worlds as default settings when new worlds are detected.",
+			"# This is the list of blocks that should not be overwritten by wilderness explosion reverts. (if empty all ",
+			"# blocks placed into regenerating explosions will be overwritten with the original pre-explosion blocks.)",
+			"# This list is useful if you have a death chest plugin which could put a player's inventory inside chest",
+			"# that is inside of a regenerating creeper explosion pit. For Example: By putting CHEST here you can ",
+			"# prevent the chest from being overwritten by the dirt block that used to be there."),
 
 	GTOWN_SETTINGS(
 			"global_town_settings",
@@ -1462,14 +1471,6 @@ public enum ConfigNodes {
 			"plugin.interfacing.tekkit.fake_residents",
 			"[IndustrialCraft],[BuildCraft],[Redpower],[Forestry],[Turtle]",
 			"# Add any fake players for client/server mods (aka Tekkit) here"),
-	PLUGIN_USING_ECONOMY(
-			"plugin.interfacing.using_economy",
-			"true",
-			"",
-			"# This enables/disables all the economy functions of Towny.",
-			"# This will first attempt to use Vault or Reserve to bridge your economy plugin with Towny.",
-			"# If Reserve/Vault is not present it will attempt to find a supported economy plugin.",
-			"# If neither Vault/Reserve or supported economy are present it will not be possible to create towns or do any operations that require money."),
 	
 	PLUGIN_LUCKPERMS_ROOT("plugin.interfacing.luckperms","",""),
 	PLUGIN_LUCKPERMS_CONTEXTS(
@@ -2319,6 +2320,14 @@ public enum ConfigNodes {
 			"# +------------------------------------------------------+ #",
 			"############################################################",
 			""),
+	ECO_USING_ECONOMY(
+			"economy.using_economy",
+			"true",
+			"",
+			"# This enables/disables all the economy functions of Towny.",
+			"# This will first attempt to use Vault or Reserve to bridge your economy plugin with Towny.",
+			"# If Reserve/Vault is not present it will attempt to find a supported economy plugin.",
+			"# If neither Vault/Reserve or supported economy are present it will not be possible to create towns or do any operations that require money."),
 	ECO_USE_ASYNC(
 			"economy.use_async",
 			"true",
