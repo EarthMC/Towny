@@ -2972,6 +2972,14 @@ public class TownySettings {
 		return getBoolean(ConfigNodes.SPAWNING_DAMAGE_CANCELS_SPAWN_WARMUP);
 	}
 	
+	public static boolean isTeleportWarmupUsingTitleMessage() {
+		return getBoolean(ConfigNodes.SPAWNING_WARMUP_USES_TITLE_MESSAGE);
+	}
+	
+	public static boolean isTeleportWarmupShowingParticleEffect() {
+		return getBoolean(ConfigNodes.SPAWNING_WARMUP_SHOWS_PARTICLE);
+	}
+	
 	public static int getSpawnCooldownTime() {
 		
 		return getInt(ConfigNodes.SPAWNING_TOWN_SPAWN_COOLDOWN_TIMER);
@@ -3327,6 +3335,10 @@ public class TownySettings {
 		return getString(ConfigNodes.FILTERS_PAPI_REL_FORMATTING_SAME_NATION);
 	}
 	
+	public static String getPAPIRelationConqueredTown() {
+		return getString(ConfigNodes.FILTERS_PAPI_REL_FORMATTING_CONQUERED_TOWN);
+	}
+	
 	public static String getPAPIRelationAlly() {
 		return getString(ConfigNodes.FILTERS_PAPI_REL_FORMATTING_ALLY);
 	}
@@ -3572,6 +3584,10 @@ public class TownySettings {
 		return getBoolean(ConfigNodes.TOWN_RUINING_TOWN_DEPOSITS_BANK_TO_NATION);
 	}
 
+	public static boolean doRuinsPlotPermissionsProgressivelyAllowAll() {
+		return getBoolean(ConfigNodes.TOWN_RUINING_TOWN_PLOTS_PERMISSIONS_OPEN_UP_PROGRESSIVELY);
+	}
+
 	public static void saveConfig() {
 		config.save();
 	}
@@ -3595,16 +3611,13 @@ public class TownySettings {
 	public static Map<Integer, NationLevel> getConfigNationLevel() {
 		return configNationLevel;
 	}
-
-	public static boolean isShowingLocaleMessage() {
-		return getBoolean(ConfigNodes.RES_SETTING_IS_SHOWING_LOCALE_MESSAGE);
-	}
 	
 	public static boolean isLanguageEnabled(@NotNull String locale) {
 		// Either all languages are enabled or, we auto-enable English: Addons that only
 		// have english translations and/or are missing a translation for the enabled
 		// language(s) on this server need to be able to inject their english
 		// tranlations.
+		locale = locale.replace("-", "_");
 		if (getString(ConfigNodes.ENABLED_LANGUAGES).equals("*") || locale.equalsIgnoreCase("en_us"))
 			return true;
 		
@@ -3704,6 +3717,10 @@ public class TownySettings {
 		return getStrArr(ConfigNodes.GTOWN_SETTINGS_UNKICKABLE_RANKS);
 	}
 	
+	public static boolean doTrustedPlayersGetPermsOnPersonallyOwnedLand() {
+		return getBoolean(ConfigNodes.GTOWN_SETTINGS_DO_TRUSTED_PLAYERS_GET_PERMS_ON_PERSONALLY_OWNED_LAND);
+	}
+
 	public static boolean areProtectedEntitiesProtectedAgainstMobs() {
 		return getBoolean(ConfigNodes.PROT_MOB_TYPES_MOB_VS_MOB_BYPASS);
 	}
