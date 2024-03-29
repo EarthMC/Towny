@@ -73,8 +73,12 @@ public enum ConfigNodes {
 			"# +------------------------------------------------------+ #",
 			"############################################################",
 			""),
-	LEVELS_TOWN_LEVEL("levels.town_level", "", "", "# Guide On How to Configure: https://github.com/TownyAdvanced/Towny/wiki/How-Towny-Works#configuring-town_level-and-nation_level"),
-	LEVELS_NATION_LEVEL("levels.nation_level", "", "", "# Guide On How to Configure: https://github.com/TownyAdvanced/Towny/wiki/How-Towny-Works#configuring-town_level-and-nation_level"),
+	LEVELS_TOWN_LEVEL("levels.town_level", "", "",
+			"# Guide On How to Configure: https://github.com/TownyAdvanced/Towny/wiki/How-Towny-Works#configuring-town_level-and-nation_level",
+			"# One note: You can add and remove levels from this list, but you should never remove the first numResidents: 0 block."),
+	LEVELS_NATION_LEVEL("levels.nation_level", "", "",
+			"# Guide On How to Configure: https://github.com/TownyAdvanced/Towny/wiki/How-Towny-Works#configuring-town_level-and-nation_level",
+			"# One note: You can add and remove levels from this list, but you should never remove the first numResidents: 0 block."),
 
 
 	TOWN(
@@ -1176,7 +1180,8 @@ public enum ConfigNodes {
 			"0",
 			"",
 			"# The amount of residents a town needs to claim an outpost,",
-			"# Setting this value to 0, means a town can claim outposts no matter how many residents"),
+			"# Setting this value to 0, means a town can claim outposts no matter how many residents.",
+			"# This setting is ignored when limit_outposts_using_town_and_nation_levels is set to true."),
 
 	CLAIMING_OVERCLAIMING_ROOT("claiming.overclaiming", "", "", ""),
 	CLAIMING_OVER_ALLOWED_CLAIM_LIMITS_ALLOWS_STEALING_LAND(
@@ -1664,12 +1669,20 @@ public enum ConfigNodes {
 			"4",
 			"",
 			"# Maximum length for Town and Nation tags."),
-	FILTERS_MODIFY_CHAT_MAX_LGTH(
+	FILTERS_MODIFY_CHAT_MAX_TITLE_LENGTH(
 			"filters_colour_chat.modify_chat.max_title_length",
 			"10",
 			"",
 			"# Maximum length of titles and surnames."),
-	
+	FILTERS_MODIFY_CHAT_DO_TITLES_AND_SURTITLES_REQUIRE_PERMISSION_FOR_COLOUR_CODES(
+			"filters_colour_chat.modify_chat.does_adding_colour_codes_require_permission_node",
+			"false",
+			"",
+			"# When true, a mayor or king will need the permission node in order to add colour codes to residents' titles and surtitles.",
+			"# Kings require towny.command.nation.set.title.colours, mayors require towny.command.town.set.title.colours.",
+			"# These nodes are not given out by the default townyperms.yml and must be added to the mayor and king section",
+			"# when this setting has been made true."),
+
 	FILTERS_PAPI_CHAT_FORMATTING(
 			"filters_colour_chat.papi_chat_formatting","","",
 			"# See the Placeholders wiki page for list of PAPI placeholders.",
