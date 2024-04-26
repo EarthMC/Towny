@@ -3,26 +3,26 @@ package com.palmergames.bukkit.towny.command;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyCommandAddonAPI;
+import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyFormatter;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.TownyUniverse;
-import com.palmergames.bukkit.towny.TownyCommandAddonAPI.CommandType;
 import com.palmergames.bukkit.towny.confirmations.Confirmation;
 import com.palmergames.bukkit.towny.confirmations.ConfirmationTransaction;
 import com.palmergames.bukkit.towny.event.NewTownEvent;
 import com.palmergames.bukkit.towny.event.PreNewTownEvent;
 import com.palmergames.bukkit.towny.event.TownAddResidentRankEvent;
-import com.palmergames.bukkit.towny.event.TownBlockSettingsChangedEvent;
 import com.palmergames.bukkit.towny.event.TownBlockPermissionChangeEvent;
+import com.palmergames.bukkit.towny.event.TownBlockSettingsChangedEvent;
 import com.palmergames.bukkit.towny.event.TownInvitePlayerEvent;
+import com.palmergames.bukkit.towny.event.TownPreAddResidentEvent;
 import com.palmergames.bukkit.towny.event.TownPreClaimEvent;
 import com.palmergames.bukkit.towny.event.TownPreRenameEvent;
 import com.palmergames.bukkit.towny.event.TownRemoveResidentRankEvent;
 import com.palmergames.bukkit.towny.event.nation.NationKingChangeEvent;
 import com.palmergames.bukkit.towny.event.teleport.OutlawTeleportEvent;
-import com.palmergames.bukkit.towny.event.TownPreAddResidentEvent;
 import com.palmergames.bukkit.towny.event.town.TownCedePlotEvent;
 import com.palmergames.bukkit.towny.event.town.TownKickEvent;
 import com.palmergames.bukkit.towny.event.town.TownLeaveEvent;
@@ -37,32 +37,28 @@ import com.palmergames.bukkit.towny.event.town.TownPreUnclaimCmdEvent;
 import com.palmergames.bukkit.towny.event.town.TownSetSpawnEvent;
 import com.palmergames.bukkit.towny.event.town.TownTrustAddEvent;
 import com.palmergames.bukkit.towny.event.town.TownTrustRemoveEvent;
-import com.palmergames.bukkit.towny.event.town.toggle.TownToggleNeutralEvent;
-import com.palmergames.bukkit.towny.event.town.toggle.TownToggleUnknownEvent;
+import com.palmergames.bukkit.towny.event.town.TownTrustTownAddEvent;
+import com.palmergames.bukkit.towny.event.town.TownTrustTownRemoveEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownToggleExplosionEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownToggleFireEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownToggleMobsEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownToggleNationZoneEvent;
+import com.palmergames.bukkit.towny.event.town.toggle.TownToggleNeutralEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownToggleOpenEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownTogglePVPEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownTogglePublicEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownToggleTaxPercentEvent;
-import com.palmergames.bukkit.towny.event.town.TownTrustTownAddEvent;
-import com.palmergames.bukkit.towny.event.town.TownTrustTownRemoveEvent;
+import com.palmergames.bukkit.towny.event.town.toggle.TownToggleUnknownEvent;
 import com.palmergames.bukkit.towny.exceptions.AlreadyRegisteredException;
+import com.palmergames.bukkit.towny.exceptions.CancelledEventException;
 import com.palmergames.bukkit.towny.exceptions.NoPermissionException;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
-import com.palmergames.bukkit.towny.exceptions.CancelledEventException;
 import com.palmergames.bukkit.towny.invites.Invite;
 import com.palmergames.bukkit.towny.invites.InviteHandler;
 import com.palmergames.bukkit.towny.invites.InviteReceiver;
 import com.palmergames.bukkit.towny.invites.InviteSender;
 import com.palmergames.bukkit.towny.invites.exceptions.TooManyInvitesException;
 import com.palmergames.bukkit.towny.object.Coord;
-import com.palmergames.bukkit.towny.object.Translatable;
-import com.palmergames.bukkit.towny.object.comparators.ComparatorCaches;
-import com.palmergames.bukkit.towny.object.comparators.ComparatorType;
-import com.palmergames.bukkit.towny.object.economy.Account;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.SpawnType;
@@ -71,19 +67,23 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownBlockOwner;
 import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.object.TownBlockTypeCache;
+import com.palmergames.bukkit.towny.object.TownBlockTypeCache.CacheType;
 import com.palmergames.bukkit.towny.object.TownBlockTypeHandler;
+import com.palmergames.bukkit.towny.object.TownyObject;
 import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.object.TownyPermissionChange;
 import com.palmergames.bukkit.towny.object.TownyWorld;
+import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.Translation;
 import com.palmergames.bukkit.towny.object.Translator;
 import com.palmergames.bukkit.towny.object.WorldCoord;
-import com.palmergames.bukkit.towny.object.TownBlockTypeCache.CacheType;
+import com.palmergames.bukkit.towny.object.comparators.ComparatorCaches;
+import com.palmergames.bukkit.towny.object.comparators.ComparatorType;
+import com.palmergames.bukkit.towny.object.economy.Account;
 import com.palmergames.bukkit.towny.object.inviteobjects.PlayerJoinTownInvite;
 import com.palmergames.bukkit.towny.object.jail.Jail;
 import com.palmergames.bukkit.towny.object.jail.JailReason;
 import com.palmergames.bukkit.towny.object.jail.UnJailReason;
-import com.palmergames.bukkit.towny.object.TownyObject;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
 import com.palmergames.bukkit.towny.permissions.TownyPermissionSource;
 import com.palmergames.bukkit.towny.permissions.TownyPerms;
@@ -116,13 +116,11 @@ import com.palmergames.util.Pair;
 import com.palmergames.util.StringMgmt;
 import com.palmergames.util.TimeMgmt;
 import com.palmergames.util.TimeTools;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -142,6 +140,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -182,6 +181,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		"mayor",
 		"merge",
 		"new",
+		"newoverclaim",
 		"nfs",
 		"notforsale",
 		"online",
@@ -665,6 +665,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		case "mayor" -> parseTownyMayorCommand(player);
 		case "merge"-> parseTownMergeCommand(player, subArg);
 		case "new", "create"-> parseTownNewCommand(player, split);
+		case "newoverclaim"-> parseTownNewOverclaimCommand(player, split);
 		case "notforsale", "nfs"-> parseTownNotForSaleCommand(player);
 		case "online"-> parseTownOnlineCommand(player, subArg);
 		case "outlaw", "ban"-> parseTownOutlawCommand(player, subArg, false, getResidentOrThrow(player).getTown());
@@ -2559,6 +2560,159 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		.setCost(new ConfirmationTransaction(() -> cost, resident, "New Town Cost",
 			Translatable.of("msg_no_funds_new_town2", (resident.getName().equals(player.getName()) ? Translatable.of("msg_you") : resident.getName()), prettyMoney(cost))))
 		.sendTo(player);
+	}
+
+	private void parseTownNewOverclaimCommand(final Player player, String[] split) throws NoPermissionException, TownyException {
+		checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_NEW.getNode());
+		if (split.length == 1) {
+			throw new TownyException(Translatable.of("msg_specify_name"));
+		} else {
+			String townName = String.join("_", StringMgmt.remFirstArg(split));
+			boolean noCharge = TownySettings.getNewTownPrice() == 0.0 || !TownyEconomyHandler.isActive();
+			newOverclaimTown(player, townName, getResidentOrThrow(player), noCharge);
+		}
+	}
+
+	/**
+	 * Create a new town. Command: /town new [town]
+	 *
+	 * @param player - Player.
+	 * @param name - name of town
+	 * @param resident - The resident in charge of the town.
+	 * @param noCharge - charging for creation - /ta town new NAME MAYOR has no charge.
+	 * @throws TownyException when a new town isn't allowed.
+	 */
+	public static void newOverclaimTown(Player player, String name, Resident resident, boolean noCharge) throws TownyException {
+		newOverclaimTown(player, name, resident, noCharge, false);
+	}
+
+	/**
+	 * Create a new town. Command: /town new [townname] or /ta town new [townname]
+	 *
+	 * @param player Player using the command.
+	 * @param name Name of town
+	 * @param resident The resident in charge of the town.
+	 * @param noCharge Charging for creation - /ta town new NAME MAYOR has no charge.
+	 * @param adminCreated true when an admin has used /ta town new [NAME].
+	 * @throws TownyException when a new town isn't allowed.
+	 */
+	public static void newOverclaimTown(Player player, String name, Resident resident, boolean noCharge, boolean adminCreated) throws TownyException {
+		if (!TownySettings.isOverClaimingAllowingStolenLand())
+			throw new TownyException(Translatable.of("msg_err_taking_over_claims_is_not_enabled"));
+
+		WorldCoord wc = WorldCoord.parseWorldCoord(player);
+		
+		// Make sure this is in a town which is overclaimed, allowing for stealing land.
+		if (!wc.canBeStolen())
+			throw new TownyException(Translatable.of("msg_err_this_townblock_cannot_be_taken_over"));
+		
+		if (TownySettings.hasTownLimit() && TownyUniverse.getInstance().getTowns().size() >= TownySettings.getTownLimit())
+			throw new TownyException(Translatable.of("msg_err_universe_limit"));
+
+		// Check if the player has a cooldown since deleting their town.
+		if (!resident.isAdmin() && CooldownTimerTask.hasCooldown(player.getName(), CooldownType.TOWN_DELETE))
+			throw new TownyException(Translatable.of("msg_err_cannot_create_new_town_x_seconds_remaining",
+				CooldownTimerTask.getCooldownRemaining(player.getName(), CooldownType.TOWN_DELETE)));
+
+		if (TownySettings.getTownAutomaticCapitalisationEnabled())
+			name = StringMgmt.capitalizeStrings(name);
+
+		name = NameValidation.checkAndFilterTownNameOrThrow(name);
+		if (TownyUniverse.getInstance().hasTown(name))
+			throw new TownyException(Translatable.of("msg_err_name_validation_name_already_in_use", name));
+
+		if (resident.hasTown())
+			throw new TownyException(Translatable.of("msg_err_already_res", resident.getName()));
+
+		final TownyWorld world = TownyAPI.getInstance().getTownyWorld(player.getWorld());
+
+		if (world == null || !world.isUsingTowny())
+			throw new TownyException(Translatable.of("msg_set_use_towny_off"));
+
+		Location spawnLocation = player.getLocation();
+		Coord key = Coord.parseCoord(player);
+		
+		if (TownyAPI.getInstance().isWilderness(spawnLocation))
+			throw new TownyException("Use the /t new command to found a new town in wilderness!");
+		
+		if (!newTownWouldBeFoundedOnBorder(WorldCoord.parseWorldCoord(spawnLocation)))
+			throw new TownyException("A town cannot be founded here due to not being on the border of the existing overclaimable town!");
+
+		// If the town doesn't cost money to create, just make the Town.
+		if (noCharge || !TownyEconomyHandler.isActive()) {
+			BukkitTools.ifCancelledThenThrow(new PreNewTownEvent(player, name, spawnLocation, 0));
+			newTown(world, name, resident, key, spawnLocation, player);
+			TownyMessaging.sendGlobalMessage(Translatable.of("msg_new_town", player.getName(), StringMgmt.remUnderscore(name)));
+			return;
+		}
+
+		// Fire a cancellable event that allows allows plugins to alter the price of a town.
+		PreNewTownEvent pnte = new PreNewTownEvent(player, name, spawnLocation, TownySettings.getNewTownPrice());
+		BukkitTools.ifCancelledThenThrow(pnte);
+
+		// Test if the resident can afford the town.
+		double cost = pnte.getPrice();
+		if (!resident.getAccount().canPayFromHoldings(cost))
+			throw new TownyException(Translatable.of("msg_no_funds_new_town2", (resident.getName().equals(player.getName()) ? Translatable.of("msg_you") : resident.getName()), cost));
+
+		// Send a confirmation before taking their money and throwing the PreNewTownEvent.
+		final String finalName = name;
+		Confirmation.runOnAccept(() -> {
+				try {
+					// Make town.
+					newTown(world, finalName, resident, key, spawnLocation, player);
+					
+					// Get townblock and town.
+					TownBlock townblock = Objects.requireNonNull(TownyAPI.getInstance().getTown(player.getLocation())).getTownBlock(wc);
+					Town town = TownyAPI.getInstance().getTown(player);
+
+					// This should never happen.
+					if (town == null)
+						throw new TownyException(String.format("Error fetching new town from name '%s'", finalName));
+					
+					// Assign townblock to new town and set it as homeblock.
+					townblock.setTown(town);
+					town.setHomeBlock(townblock);
+					
+					resident.save();
+					townblock.save();
+					town.save();
+					world.save();
+					
+					TownyMessaging.sendGlobalMessage(Translatable.of("msg_new_town", player.getName(), StringMgmt.remUnderscore(finalName)));
+				} catch (TownyException e) {
+					TownyMessaging.sendErrorMsg(player, e.getMessage(player));
+					plugin.getLogger().log(Level.WARNING, "An exception occurred while creating a new town", e);
+				}
+			})
+			.setTitle(Translatable.of("msg_confirm_purchase", prettyMoney(cost)))
+			.setCost(new ConfirmationTransaction(() -> cost, resident, "New Town Cost",
+				Translatable.of("msg_no_funds_new_town2", (resident.getName().equals(player.getName()) ? Translatable.of("msg_you") : resident.getName()), prettyMoney(cost))))
+			.sendTo(player);
+	}
+
+	private static boolean newTownWouldBeFoundedOnBorder(WorldCoord worldCoord) { // TODO: Remove print debugs
+		Town currentTown = worldCoord.getTownOrNull();
+		List<WorldCoord> surroundingClaims = worldCoord.getCardinallyAdjacentWorldCoords(true);
+
+		// Log the list of surrounding claims
+		System.out.println("Surrounding Claims: " + surroundingClaims);
+
+		// Check if all four cardinal chunks belong to the same town
+		long sameTownChunks = surroundingClaims.stream().filter(wc -> {
+			// Log each individual chunk being checked by the stream
+			System.out.println("Checking chunk: " + wc);
+			return wc.hasTown(currentTown);
+		}).count();
+
+		// Log the final conclusion on true or false
+		if (sameTownChunks == 8) {
+			System.out.println("Final Conclusion: false");
+			return false;
+		} else {
+			System.out.println("Final Conclusion: true");
+			return true;
+		}
 	}
 
 	public static Town newTown(TownyWorld world, String name, Resident resident, Coord key, Location spawn, Player player) throws TownyException {
