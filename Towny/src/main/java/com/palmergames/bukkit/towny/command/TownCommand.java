@@ -992,7 +992,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		Location loc = player.getLocation();
 
 		if (!TownySettings.areNewOutlawsTeleportedAway() || TownyAPI.getInstance().isWilderness(loc)
-			|| !TownyAPI.getInstance().getTown(loc).equals(town) || !BukkitTools.isEventCancelled(new OutlawTeleportEvent(target, town, loc)))
+			|| !TownyAPI.getInstance().getTown(loc).equals(town) || BukkitTools.isEventCancelled(new OutlawTeleportEvent(target, town, loc)))
 			return;
 
 		// If the newly-outlawed player is within the town's borders send them using the
@@ -3091,6 +3091,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		// Make sure we are allowed to set these permissions.
 		toggleTest(town, StringMgmt.join(split, " "));
 		setTownBlockPermissions(sender, town, town.getPermissions(), split, false);
+		town.save();
 	}
 
 	public static void setTownBlockPermissions(CommandSender sender, TownBlockOwner townBlockOwner, TownyPermission perm, String[] split, boolean friend) {
@@ -3675,7 +3676,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		double cost = TownySettings.getTakeoverClaimPrice();
 		String costSlug = !TownyEconomyHandler.isActive() || cost <= 0 ? Translatable.of("msg_spawn_cost_free").forLocale(player) : prettyMoney(cost);
 		String townName = overclaimedTown.getName();
-		Confirmation.runOnAccept(() -> Bukkit.getScheduler().runTask(plugin, new TownClaim(plugin, player, town, Arrays.asList(wc), false, true, false, true)))
+		Confirmation.runOnAcceptAsync(new TownClaim(plugin, player, town, Arrays.asList(wc), false, true, false, true))
 			.setTitle(Translatable.of("confirmation_you_are_about_to_take_over_a_claim", townName, costSlug))
 			.setCost(new ConfirmationTransaction(() -> cost, town, "Takeover Claim (" + wc.toString() + ") from " + townName + "."))
 			.sendTo(player);

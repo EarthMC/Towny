@@ -1,6 +1,5 @@
 package com.palmergames.bukkit.towny;
 
-import com.github.bsideup.jabel.Desugar;
 import com.palmergames.bukkit.config.CommentedConfiguration;
 import com.palmergames.bukkit.config.ConfigNodes;
 import com.palmergames.bukkit.towny.db.DatabaseConfig;
@@ -63,7 +62,6 @@ import java.util.stream.Collectors;
 public class TownySettings {
 
 	// Town Level
-	@Desugar
 	public record TownLevel(
 			String namePrefix,
 			String namePostfix,
@@ -80,7 +78,6 @@ public class TownySettings {
 			Map<String, Integer> townBlockTypeLimits) {}
 
 	// Nation Level
-	@Desugar
 	public record NationLevel(
 			String namePrefix,
 			String namePostfix,
@@ -3672,6 +3669,10 @@ public class TownySettings {
 			enabledLanguages.add(string.toLowerCase(Locale.ROOT).replaceAll("-", "_").replaceAll(".yml", ""));
 
 		return enabledLanguages.contains(locale.toLowerCase(Locale.ROOT));
+	}
+	
+	public static boolean doMayorsPayTownTax() {
+		return getBoolean(ConfigNodes.ECO_DAILY_TAXES_DO_MAYORS_PAY_TOWN_TAX);
 	}
 	
 	public static boolean doCapitalsPayNationTax() {

@@ -19,7 +19,6 @@ import com.palmergames.bukkit.towny.tasks.MobRemovalTimerTask;
 import com.palmergames.bukkit.towny.utils.BorderUtil;
 import com.palmergames.bukkit.towny.utils.CombatUtil;
 import com.palmergames.bukkit.towny.utils.EntityTypeUtil;
-import com.palmergames.bukkit.towny.utils.MinecraftVersion;
 import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.EntityLists;
 import com.palmergames.bukkit.util.ItemLists;
@@ -51,7 +50,6 @@ import org.bukkit.entity.Trident;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.memory.MemoryKey;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -85,7 +83,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * 
@@ -827,7 +824,7 @@ public class TownyEntityListener implements Listener {
 		// Prevent non-player actions outright if it is in a town.
 		if (!(event.getEntity().getShooter() instanceof Player player)) {
 			if (!TownyAPI.getInstance().isWilderness(hitBlock))
-				cancelProjectileHitEvent(event, hitBlock);
+				event.setCancelled(true);
 			return;
 		}
 
@@ -835,7 +832,7 @@ public class TownyEntityListener implements Listener {
 		if (disallowedTargetSwitch(hitBlock, player) ||
 			disallowedProjectileBlockBreak(hitBlock, event.getEntity(), player) ||
 			disallowedCampfireLighting(hitBlock, event.getEntity(), player)) {
-			cancelProjectileHitEvent(event, hitBlock);
+			event.setCancelled(true);
 		}
 	}
 
@@ -857,7 +854,7 @@ public class TownyEntityListener implements Listener {
 
 	private boolean disallowedProjectileBlockBreak(Block hitBlock, Projectile projectile, Player player) {
 		// Pointed dripstone can only be broken by tridents
-		if (MinecraftVersion.CURRENT_VERSION.isNewerThanOrEquals(MinecraftVersion.MINECRAFT_1_17) && hitBlock.getType() == Material.POINTED_DRIPSTONE && !(projectile instanceof Trident))
+		if (hitBlock.getType() == Material.POINTED_DRIPSTONE && !(projectile instanceof Trident))
 			return false;
 
 		// Decorated pots can't be broken by these 3 projectiles
@@ -873,21 +870,6 @@ public class TownyEntityListener implements Listener {
 
 	private boolean isFireArrow(Projectile projectile) {
 		return projectile instanceof Arrow arrow && arrow.getFireTicks() > 0;
-	}
-
-	private void cancelProjectileHitEvent(ProjectileHitEvent event, Block block) {
-		if (event instanceof Cancellable) {
-			event.setCancelled(true);
-			return;
-		}
-		/*
-		 * Since we are unable to cancel a ProjectileHitEvent before MC 1.17 we must
-		 * set the block to air then set it back to its original form. 
-		 * TODO: When support is dropped for pre-1.17 MC versions this method can be removed.
-		 */
-		BlockData data = block.getBlockData();
-		block.setType(Material.AIR);
-		plugin.getScheduler().run(block.getLocation(), () -> block.setBlockData(data));
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -920,7 +902,6 @@ public class TownyEntityListener implements Listener {
 		map.put("damage_resistance", "resistance");
 	});
 
-	@SuppressWarnings("SimplifyStreamApiCallChains")
 	private boolean hasDetrimentalEffects(Collection<PotionEffect> effects) {
 		if (effects.isEmpty())
 			return false;
@@ -928,7 +909,7 @@ public class TownyEntityListener implements Listener {
 		/*
 		 * List of potion effects blocked from PvP.
 		 */
-		final List<String> detrimentalPotions = TownySettings.getPotionTypes().stream().map(type -> type.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+		final List<String> detrimentalPotions = TownySettings.getPotionTypes().stream().map(type -> type.toLowerCase(Locale.ROOT)).toList();
 
 		return effects.stream()
 			.map(effect -> BukkitTools.potionEffectName(effect.getType()))

@@ -9821,3 +9821,28 @@ v0.92.0.11:
     - Closes #7452.
 0.100.3.0:
   - Bump version for release.
+0.100.3.1:
+  - Fix new outlaws not being teleported out of the town they were outlawed in.
+  - Fix a bad scheduler call in take over claim code, courtesy of Warrior with PR #7466.
+  - Fix plot border modes on Folia, courtesy of Warrior with PR #7467.
+  - Raise java version to 17, courtesy of Warrior with PR #7401.
+0.100.3.2:
+  - Fix WorldCoord#unloadChunks adding plugin chunk tickets, courtesy of galacticwarrior9 with PR #7478.
+  - Handle empty towns during duplicate resident removal, courtesy of Warrior with PR #7474.
+  - Add plot group creation/deletion events #7476, courtesy of Warrior with PR.
+    - Closes #7475.
+  - Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.5 to 3.3.0.
+  - Drop support for MC 1.16-1.18, update the readme.
+0.100.3.3:
+  - Fix regex settings not refreshing when using /ta reload {config}.
+  - Fix PlotGroups not being able to support max and min joindays amounts like TownBlocks.
+  - Fix WildernessMapEvent being able to be thrown async.
+  - Add option to make mayors pay their own town's tax, which could prevent towns from dying to upkeep.
+    - Closes #7482.
+  - New Config Option: economy.daily_taxes.do_mayors_pay_town_tax
+    - Default: false
+    - When true, a town's mayor will pay the town tax. This feature is a bit redundant because the mayor can
+      withdraw from the bank anyways, but it might keep towns from being deleted for not paying their upkeep.
+  - Fix potential NPEs in PlotGroup, courtesy of galacticwarrior9 with PR #7483.
+0.100.3.4:
+  - Fix town plot permissions changing not causing the town to save.
