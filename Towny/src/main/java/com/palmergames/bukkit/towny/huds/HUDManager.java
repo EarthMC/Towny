@@ -30,7 +30,7 @@ public class HUDManager implements Listener{
 
 	//**TOGGLES**//
 	public static void togglePermHUD (Player p) {
-		if (Towny.getPlugin().isFolia()) {
+		if (Towny.getPlugin().isFolia() && false) {
 			TownyMessaging.sendErrorMsg(p, Translatable.of("msg_folia_scoreboard"));
 			return;
 		}
@@ -44,7 +44,7 @@ public class HUDManager implements Listener{
 	}
 	
 	public static void toggleMapHud(Player player) {
-		if (Towny.getPlugin().isFolia()) {
+		if (Towny.getPlugin().isFolia() && false) {
 			TownyMessaging.sendErrorMsg(player, Translatable.of("msg_folia_scoreboard"));
 			return;
 		}
@@ -65,7 +65,7 @@ public class HUDManager implements Listener{
 	}
 	
 	public static void toggleOff(final Player player) {
-		if (Towny.getPlugin().isFolia())
+		if (Towny.getPlugin().isFolia() && false)
 			return;
 		
 		Optional.ofNullable(Bukkit.getScoreboardManager()).ifPresent(manager -> player.setScoreboard(manager.getMainScoreboard()));
