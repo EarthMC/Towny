@@ -22,6 +22,7 @@ import com.palmergames.bukkit.towny.utils.ProximityUtil;
 import com.palmergames.bukkit.towny.utils.TownyComponents;
 import com.palmergames.bukkit.util.BukkitTools;
 import net.kyori.adventure.audience.Audience;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -70,6 +71,20 @@ public class Nation extends Government {
 		return this.getName().equals(otherNation.getName()); // TODO: Change this to UUID when the UUID database is in use.
 	}
 
+	public List<Resident> getOnlinePlayersFromNation() {
+		List<Resident> onlinePlayersFromNation = null;
+		
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			Resident resident = TownyAPI.getInstance().getResident(player);
+			
+			if (resident != null && resident.getNationOrNull() == this) {
+				onlinePlayersFromNation.add(resident);
+			}
+		}
+		
+		return onlinePlayersFromNation;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(getUUID(), getName());
