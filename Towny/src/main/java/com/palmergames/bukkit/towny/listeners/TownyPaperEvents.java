@@ -46,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -206,12 +207,14 @@ public class TownyPaperEvents implements Listener {
 		};
 	}
 
+	private static final Set<EntityType> IGNORED_TYPES = Set.of(EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME, EntityType.ARMOR_STAND, EntityType.ITEM, EntityType.INTERACTION, EntityType.BLOCK_DISPLAY, EntityType.ITEM_DISPLAY, EntityType.PAINTING);
+
 	private Consumer<EntityEvent> entityAddToWorldListener() {
 		return event -> {
 			if (!(event.getEntity() instanceof LivingEntity entity))
 				return;
 			
-			if (entity instanceof Player || PluginIntegrations.getInstance().isNPC(entity))
+			if (entity instanceof Player || IGNORED_TYPES.contains(entity.getType()) || PluginIntegrations.getInstance().isNPC(entity))
 				return;
 
 			final TownyWorld world = TownyAPI.getInstance().getTownyWorld(entity.getWorld());

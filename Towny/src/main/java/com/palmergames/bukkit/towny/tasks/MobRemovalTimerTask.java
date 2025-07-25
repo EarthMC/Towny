@@ -111,7 +111,7 @@ public class MobRemovalTimerTask extends TownyTimerTask {
 		if (!(ent instanceof LivingEntity entity))
 			return;
 
-		if (entity instanceof Player || PluginIntegrations.getInstance().isNPC(entity))
+		if (entity instanceof Player || (!plugin.isFolia() && PluginIntegrations.getInstance().isNPC(entity))) // already checked on folia
 			return;
 
 		// Handles entities Globally.
