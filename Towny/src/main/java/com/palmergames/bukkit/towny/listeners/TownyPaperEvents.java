@@ -272,12 +272,18 @@ public class TownyPaperEvents implements Listener {
 			
 			if (entity instanceof Player || IGNORED_TYPES.contains(entity.getType()) || PluginIntegrations.getInstance().isNPC(entity))
 				return;
-			
-			plugin.getScheduler().runRepeating(entity, () -> {
-				final TownyWorld world = TownyAPI.getInstance().getTownyWorld(entity.getWorld());
-				
-				if (MobRemovalTimerTask.isRemovingEntities(world))
+
+			final TownyWorld world = TownyAPI.getInstance().getTownyWorld(entity.getWorld());
+
+			plugin.getScheduler().runRepeating(entity, task -> {
+				if (!entity.isValid()) {
+					task.cancel();
+					return;
+				}
+
+				if (MobRemovalTimerTask.isRemovingEntities(world)) {
 					MobRemovalTimerTask.checkEntity(plugin, world, entity);
+				}
 			}, 1L, TimeTools.convertToTicks(TownySettings.getMobRemovalSpeed()));
 		};
 	}
