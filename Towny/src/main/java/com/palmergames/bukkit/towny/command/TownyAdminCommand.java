@@ -3032,23 +3032,33 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 			
 			// Gather up all the balances
 			for (Town town : TownyUniverse.getInstance().getTowns()) {
-				balances.put(town.getAccount(), town.getAccount().getHoldingBalance());
+				final double balance = town.getAccount().getHoldingBalance();
+				balances.put(town.getAccount(), balance);
+				if (balance > 0) {
+					town.getAccount().withdraw(balance, "Server-initiated conversion");
+				}
 
 				town.getAccount().setUUID(TownyEconomyHandler.modifyNPCUUID(town.getUUID()));
 			}
 			
 			for (Nation nation : TownyUniverse.getInstance().getNations()) {
-				balances.put(nation.getAccount(), nation.getAccount().getHoldingBalance());
+				final double balance = nation.getAccount().getHoldingBalance();
+				balances.put(nation.getAccount(), balance);
+				if (balance > 0) {
+					nation.getAccount().withdraw(balance, "Server-initiated conversion");
+				}
 
 				nation.getAccount().setUUID(TownyEconomyHandler.modifyNPCUUID(nation.getUUID()));
 			}
 			
+			/*
 			for (Resident resident : TownyUniverse.getInstance().getResidents()) {
 				balances.put(resident.getAccount(), resident.getAccount().getHoldingBalance());
 
 				if (resident.isNPC())
 					resident.getAccount().setUUID(TownyEconomyHandler.modifyNPCUUID(resident.getUUID()));
 			}
+			*/
 			
 			balances.put(TownyServerAccount.ACCOUNT, TownyServerAccount.ACCOUNT.getHoldingBalance());
 
