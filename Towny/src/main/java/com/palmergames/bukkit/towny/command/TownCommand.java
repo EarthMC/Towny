@@ -319,7 +319,6 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		case "outlawlist":
 		case "plots":
 		case "delete":
-		case "join":
 		case "merge":
 		case "plotgrouplist":
 		case "allylist":
@@ -328,6 +327,12 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		case "ranklist":
 			if (args.length == 2)
 				return getTownyStartingWith(args[1], "t");
+			break;
+		case "join":
+			if (args.length == 2) {
+				List<String> randTowns = getTownyStartingWith(args[1], "t");
+				Collections.shuffle(randTowns);
+				return randTowns;}
 			break;
 		case "deposit":
 			if (args.length == 3)
