@@ -32,7 +32,7 @@ public class TownyCanvasEvents implements VersionDependentListener {
 
     @Override
     public void register() {
-        registerEvent(ASYNC_TELEPORT_EVENT, this::asyncTeleportEventListener, EventPriority.NORMAL, true);
+        //registerEvent(ASYNC_TELEPORT_EVENT, this::asyncTeleportEventListener, EventPriority.NORMAL, true);
     }
 
     private Consumer<EntityEvent> asyncTeleportEventListener() {
