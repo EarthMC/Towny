@@ -802,7 +802,7 @@ public class TownyPlayerListener implements Listener {
 			return;
 		}
 
-		if (this.teleportWarmupTime > 0 && this.isMovementCancellingWarmup) {
+		if (this.teleportWarmupTime > 0 && this.isMovementCancellingWarmup && (from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ())) {
 			final Resident resident = TownyAPI.getInstance().getResident(player);
 			
 			if (resident != null && resident.hasRequestedTeleport() && !resident.isAdmin() && TeleportWarmupTimerTask.abortTeleportRequest(resident, CancelledTeleportReason.MOVEMENT))
