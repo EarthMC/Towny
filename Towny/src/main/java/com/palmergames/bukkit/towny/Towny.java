@@ -171,7 +171,7 @@ public class Towny extends JavaPlugin {
 				printChangelogToConsole();
 
 				// Save database.
-				townyUniverse.getDataSource().saveAll();
+				// townyUniverse.getDataSource().saveAll();
 			}
 
 			if (!TownySettings.getLastRunVersion().equals(getVersion()))
