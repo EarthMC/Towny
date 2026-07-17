@@ -162,12 +162,14 @@ public class TownyWorldListener implements Listener {
 		Player player = null;
 		if (event.getEntity() instanceof Player p) {
 			player = p;
-		} else if (event.getEntity() instanceof Projectile projectile && projectile.getShooter() instanceof Player p) {
+		} else if (event.getEntity() instanceof Projectile projectile && projectile.getServer().isOwnedByCurrentRegion(projectile) && projectile.getShooter() instanceof Player p) {
 			player = p;
 		} else if (event.getEntity() instanceof Item item) {
-			final UUID thrower = item.getThrower();
-			if (thrower != null) {
-				player = plugin.getServer().getPlayer(thrower);
+			if (item.getServer().isOwnedByCurrentRegion(item)) {
+				final UUID thrower = item.getThrower();
+				if (thrower != null) {
+					player = plugin.getServer().getPlayer(thrower);
+				}
 			}
 		}
 
